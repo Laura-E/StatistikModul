@@ -1,0 +1,199 @@
+html {
+  	height: 100%; 
+  	/*background-color: #fafafa !important;*/
+}
+
+body {
+  	margin: 0px;
+  	font-family: 'Helvetica Neue', Helvetica, Arial;
+  	color: #333;
+  	height: 100%;
+  	-webkit-user-select: none;
+  	-moz-user-select: none;
+  	-ms-user-select: none;
+  	user-select: none;
+  	-webkit-tap-highlight-color: rgba(0,0,0,0);
+ 	-webkit-touch-callout: none;
+  	/*background-color: #fafafa !important;*/
+}
+
+.container {
+	width: 100% !important;
+}
+.box {
+	border-radius: 2px; 
+	border: 1px solid #ccc;
+	/*width: 300px;*/
+	padding: 0px !important;
+}
+
+.number {
+	font-size: 30px;
+}
+
+#numbers .title div {
+	text-align: center;
+}
+
+#numbers .box {
+	padding: 10px !important;
+}
+
+#tagcloud {
+	margin: 0 auto;
+}
+
+#options, .innerBox {
+	padding: 20px;
+	background-color: white;
+}
+
+#options button {
+	margin-bottom: 20px;
+}
+
+#options button:hover {
+	background-color: teal; 
+	color: white;
+}
+
+#optionsBox {
+	width: 470px;
+}
+
+/*#startDate {
+	margin-left: 20px;
+}*/
+
+.title {
+	color: #333;
+	background-color: #ddd;
+	padding: 5px 20px;
+	font-weight: bold;
+}
+
+#sliderValue {
+	margin-bottom: 10px;
+}
+
+#sliderValue input {
+	width: 60px !important;
+	float: left;
+}
+
+#dash {
+	float: left;
+	margin: 10px 10px 0px 10px;
+}
+
+#tagcloud span {
+	cursor: default;
+	color: #333;
+}
+
+#tagcloud {
+	height: 250px;
+    width: 250px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+    float: left;
+}
+
+.ui-rangeSlider {
+	/*padding-top: 20px;*/
+}
+
+.ui-rangeSlider-range {
+    background: teal; 
+	border-radius: 0px !important;
+}
+
+.ui-rangeSlider-container {
+	border-radius: 2px; 
+	border: none;
+	margin: 10px 0px;
+	height: 7px;
+	background: none;
+	box-shadow: none !important;
+	background-color: #ccc;
+}
+
+.ui-rangeSlider-noArrow .ui-rangeSlider-container {
+	border: none;
+}
+.ui-rangeSlider-bar {
+	background-color: teal; 
+	height: 7px;
+	margin: 0px;
+}
+.ui-rangeSlider-handle {
+	background: #333;
+	border-radius: 2px; 
+}
+
+.ui-rangeSlider-handle:focus {
+    outline:none;
+}
+
+.ui-rangeSlider .ui-rangeSlider-handle {
+    background: teal; /*#333;*/
+    width: 15px;
+    height: 15px;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    top: -3px !important;
+}
+
+.ui-datepicker-calendar {
+    display: none;
+}
+
+.ui-datepicker-trigger {
+	width: 30px; 
+	cursor: pointer; 
+}
+
+.more {
+	float: right; 
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+#coursePie {
+	height: 500px;
+}
+
+.jqplot-data-label {
+	color: white;
+}
+
+.modal-dialog {
+	width: 800px !important;
+}
+
+#loadingOverlay {
+  width: 100%; 
+  height: 100%; 
+  position: absolute; 
+  top: 0px;
+  z-index: 10;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+#calculatingResults {
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
+	position: absolute;
+	top: 50%;
+	left: 45%;
+	padding-top: 50px;
+}
+
+#loginStatisticsChart, #accessStatisticsChart {
+	width	: 100%;
+	height	: 300px;
+}	
