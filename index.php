@@ -16,9 +16,23 @@
 
 	<body>
 
+    <div class="modal fade" id="chartEnlargementModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="loginStatisticsTableTitle">Chart</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="enlargementChart"></div>    
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="loginStatisticsModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content"K>
+            <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="loginStatisticsTableTitle">Login-Statistik</h4>
@@ -108,6 +122,9 @@
                             <tr>
                                 <th>Kategorie</th>
                                 <th>Kurse</th>
+                                <th>Materialien</th>
+                                <th>Teilnehmer</th>
+                                <th>Dozenten</th>
                             </tr>
                         </thead>
                         <tbody id="categoryStatisticsTableItemContainer">
@@ -176,7 +193,7 @@
             <br />
             <div class="row">
                 <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Zugriffs-Statistik<div class="more" id="accessStatisticsMoreButton">mehr</div></div>
+                    <div class="title">Zugriffs-Statistik<span id="readWriteChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="accessStatisticsMoreButton">mehr</div></div>
                     <div class="innerBox"><div id="accessStatisticsChart"></div></div>
                 </div>
                 <div class="col-xs-9 col-md-6 box">
@@ -194,11 +211,11 @@
             </div>
             <div class="row">
                 <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Login-Statistik<div class="more" id="loginStatisticsMoreButton">mehr</div></div>
+                    <div class="title">Login-Statistik<span id="loginChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="loginStatisticsMoreButton">mehr</div></div>
                     <div class="innerBox"><div id="loginStatisticsChart"></div></div>
                 </div>
                 <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Kurs-Statistik<div class="more" id="courseStatisticsMoreButton">mehr</div></div>
+                    <div class="title">Kurs-Statistik<span class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
                     <div class="innerBox"><div id="tagcloud"></div></div>
                 </div>
             </div>
@@ -248,6 +265,9 @@
         <tr id="<%= id %>">
             <td><%= category %></td>
             <td><%= courseCount %></td>
+            <td><%= materialsCount %></td>
+            <td><%= subscriberCount %></td>
+            <td><%= trainerCount %></td>
         </tr>
     </script>
 

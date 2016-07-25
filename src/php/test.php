@@ -136,26 +136,61 @@
         
         $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
         $categories = $DB->get_records_sql($sql);
-        echo json_encode($categories);
+        //echo json_encode($categories);
         //Die Userzahlen für die Kategorien aufsummieren.
         $statsdata = array();
         $courseidsstr = array();
         foreach ($courseids as $maincategory => $courseid) {
             $courseidstr[$maincategory] = "(".implode(",", $courseid).")";
-            $sql = "SELECT '$maincategory' as category, '".count($courseid)."' as kurse, ".
+            $sql = "SELECT '$maincategory' as category, '".count($courseid)."' as courses, ".
                     "sum(teilnahmen) as teilnahmen, sum(kursleitungen) as kursleitungen ".
                     "FROM mdl_tmp_stats_coursecounts ".
                     "WHERE courseid in {$courseidstr[$maincategory]} ";
             if(array_key_exists("c_".$maincategory, $colors)) {
-                $statsdata[$maincategory] = $DB->get_records_sql($sql);
-                echo $maincategory." ";
+                //$courseData = $DB->get_records_sql($sql);
+                //echo $DB->get_records_sql($sql)["".$maincategory]->kurse;
+                $statsdata[$maincategory]["courses"] = $DB->get_records_sql($sql)["".$maincategory]->courses;
                 $statsdata[$maincategory]["color"] = $colors["c_".$maincategory];
                 $statsdata[$maincategory]["name"] = $categories["".$maincategory]->name;
+                $statsdata[$maincategory]["trainer"] = getTrainerCount($courseidstr[$maincategory]);
+                $statsdata[$maincategory]["subscriber"] = getSubscriberCount($courseidstr[$maincategory]);
+                $statsdata[$maincategory]["materials"] = getMaterialsCount($courseidstr[$maincategory]);
             }
         }
 
         echo json_encode($statsdata);
     
+    }
+
+    function getSubscriberCount($courseids) {
+        global $DB;
+        $sql = "SELECT count(DISTINCT userid) as count ".
+                "FROM mdl_role_assignments ra ".
+                "JOIN mdl_context ctx ON ctx.id = ra.contextid ".
+                "JOIN mdl_tmp_stats_activecourses ac ON ctx.instanceid = ac.courseid ".
+                "WHERE (ra.roleid not in (1, 2, 3, 4, 8, 10 ,11,12,14,16)) ".
+                "AND ctx.instanceid in $courseids";
+        $count = $DB->get_record_sql($sql);
+
+        return $count->count;
+    }
+
+    function getTrainerCount($courseids) {
+        global $DB;
+        $sql = "SELECT count(DISTINCT userid) as count ".
+                "FROM mdl_role_assignments ra ".
+                "JOIN mdl_context ctx ON ctx.id = ra.contextid ".
+                "JOIN mdl_tmp_stats_activecourses ac ON ctx.instanceid = ac.courseid ".
+                "WHERE (ra.roleid in (1, 2, 3, 4, 8, 10 ,11,12,14,16)) ".
+                "AND ctx.instanceid in $courseids";
+        $count = $DB->get_record_sql($sql);
+        return $count->count;
+    }
+
+    function getMaterialsCount($courseids) {
+        global $DB;
+        $count = $DB->count_records_select('resource', "course in {$courseids}");
+        return $count;
     }
 
     function make_categories_list_ls(&$list, &$parents, $requiredcapability = '',

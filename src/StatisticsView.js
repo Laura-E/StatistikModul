@@ -3,23 +3,33 @@ StatisticsModule.StatisticsView = (function() {
 	timeperiodSlider, 
 	loginStatisticsChart, 
 	accessStatisticsChart, 
+	enlargementLoginChart, 
+	enlargementReadWriteChart,
 	accessStatisticsTableItemCount = 0, 
 	loginStatisticsTableItemCount = 0, 
+	courseStatisticsTableItemCount = 0, 
+	categoryStatisticsTableItemCount = 0, 
 	
 	init = function() {
      	initSlider(); 
      	initDatePicker(); 
-     	//initPlot(); 
-     	//initCloud(); 
-		getBrowser();  
-		getOS(); 
-		addCourseStatisticsTableItem(1, 23, "234", "54");
+		addCourseStatisticsTableItem(23, "234", "54");
 		$("#loginStatisticsMoreButton").on('click', onLoginStatisticsMoreButtonClick); 
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
 		$("#categoryStatisticsMoreButton").on('click', onCategoryStatisticsMoreButtonClick); 
-
 		return that; 
+	}, 
+
+	onEnlargementButtonClick = function(event) {
+		$("#chartEnlargementModal").modal('show');
+		var option = event.data.option;
+		initChart(event.data.chartObject, option); 
+		if (option == "loginEnlargement") {
+			changeZoomDates(enlargementLoginChart); 
+		} else if (option == "readWriteEnlargement") {
+			changeZoomDates(enlargementReadWriteChart);
+		}
 	}, 
 
 	onCategoryStatisticsMoreButtonClick = function(event) {
@@ -47,12 +57,18 @@ StatisticsModule.StatisticsView = (function() {
 		for (var key in object) {
 			var faculty = object[key];
 			var text = faculty["name"];
-			var weight = faculty[key]["kurse"];
+			var weight = faculty["courses"];
 			var color = faculty["color"];
+			var materials = faculty["materials"];
+			var subscriber = faculty["subscriber"];
+			var trainer = faculty["trainer"];
 			var word = {};
 			word['text'] = text;
 			word['weight'] = weight;
 			word['color'] = color;
+			word['materials'] = materials;
+			word['subscriber'] = subscriber;
+			word['trainer'] = trainer;
 			words.push(word); 
 		}
 		initCloud(words); 
@@ -82,7 +98,6 @@ StatisticsModule.StatisticsView = (function() {
 	}, 
 
 	drawPieChart = function(words) {
-		console.log("draw"); 
 		var data = [], chart_labels = [], chart_series_colors = [];
 		var weightSum = 0; 
 		for (var i = 0; i < words.length; i++) {
@@ -90,11 +105,14 @@ StatisticsModule.StatisticsView = (function() {
 			var weight = word["weight"];
 			var text = word["text"];
 			var color = word["color"];
+			var materials = word["materials"];
+			var subscriber = word["subscriber"];
+			var trainer = word["trainer"];
 			weightSum += parseInt(weight);
 			data.push(weight);
 			chart_labels.push(text);
 			chart_series_colors.push(color);
-			addCategoryStatisticsTableItem("1", text, weight); 
+			addCategoryStatisticsTableItem(text, weight, materials, subscriber, trainer); 
 		}
 		for (var i = 0; i < data.length; i++) {
 			data[i] = (parseInt(data[i])/weightSum) *100;
@@ -123,66 +141,6 @@ StatisticsModule.StatisticsView = (function() {
 	        seriesColors: chart_series_colors
 	    });
 	}, 
-
-	/*initPlot = function() {
-		plot1 = $.jqplot('browserChart', [[[2,"IE"], [6,"Firefox"], [7,"Safari"], [10,"Chrome"]]], {
-            captureRightClick: true,
-            seriesDefaults:{
-                renderer:$.jqplot.BarRenderer,
-                shadowAngle: 135,
-                rendererOptions: {
-                    barDirection: 'horizontal', 
-                    barWidth: 20, 
-                    color: "teal", 
-                    shadowOffset: 0
-                },
-                pointLabels: {show: true, formatString: '%d'}
-            },
-            axes: {
-                yaxis: {
-                    renderer: $.jqplot.CategoryAxisRenderer
-                }, 
-                xaxis: {
-                	tickOptions: {
-				        show: false
-				    },
-				    rendererOptions: {
-				        drawBaseline: false
-				    }
-                }
-            }, 
-            grid: {drawGridlines: false, background: 'transparent', borderColor: 'transparent', shadow: false, drawBorder: true},
-	    });
-
-	    plot2 = $.jqplot('OSChart', [[[6,"Mac"], [5,"Windows 8"], [3,"Windows 7"], [9,"Android"]]], {
-            captureRightClick: true,
-            seriesDefaults:{
-                renderer:$.jqplot.BarRenderer,
-                shadowAngle: 135,
-                rendererOptions: {
-                    barDirection: 'horizontal', 
-                    barWidth: 20, 
-                    color: "teal", 
-                    shadowOffset: 0
-                },
-                pointLabels: {show: true, formatString: '%d'}
-            },
-            axes: {
-                yaxis: {
-                    renderer: $.jqplot.CategoryAxisRenderer
-                }, 
-                xaxis: {
-                	tickOptions: {
-				        show: false
-				    },
-				    rendererOptions: {
-				        drawBaseline: false
-				    }
-                }
-            }, 
-            grid: {drawGridlines: false, background: 'transparent', borderColor: 'transparent', shadow: false, drawBorder: true},
-	    });
-	}, */
 
 	initDatePicker = function() {
 		$('.date-picker').datepicker( {
@@ -254,31 +212,6 @@ StatisticsModule.StatisticsView = (function() {
 		});
 	}, 
 
-	getBrowser = function() { 
-		//Quelle: http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
-    	if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ) BrowserName = 'Opera';
-	    else if(navigator.userAgent.indexOf("Chrome") != -1 ) BrowserName = 'Chrome';
-	    else if(navigator.userAgent.indexOf("Safari") != -1) BrowserName = 'Safari';
-	    else if(navigator.userAgent.indexOf("Firefox") != -1 ) BrowserName = 'Firefox';
-	    else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) BrowserName = 'IE'; //IF IE > 10 
-	    else BrowserName = 'Unknown';
-	    console.log(BrowserName); 
-    }, 
-
-    getOS = function() {
-    	//Quelle: http://stackoverflow.com/questions/9514179/how-to-find-the-operating-system-version-using-javascript
-    	var OSName = "Unknown";
-		if (window.navigator.userAgent.indexOf("Windows NT 6.2") != -1) OSName="Windows 8";
-		if (window.navigator.userAgent.indexOf("Windows NT 6.1") != -1) OSName="Windows 7";
-		if (window.navigator.userAgent.indexOf("Windows NT 6.0") != -1) OSName="Windows Vista";
-		if (window.navigator.userAgent.indexOf("Windows NT 5.1") != -1) OSName="Windows XP";
-		if (window.navigator.userAgent.indexOf("Windows NT 5.0") != -1) OSName="Windows 2000";
-		if (window.navigator.userAgent.indexOf("Mac")!=-1) OSName="Mac/iOS";
-		if (window.navigator.userAgent.indexOf("X11")!=-1) OSName="UNIX";
-		if (window.navigator.userAgent.indexOf("Linux")!=-1) OSName="Linux";
-		console.log(OSName); 
-    }, 
-
 	makeLoginStatisticsTableItem = function(options) {
 		var item = StatisticsModule.LoginStatisticsTableItem().init({
 			id: options.id,
@@ -312,9 +245,9 @@ StatisticsModule.StatisticsView = (function() {
 		$("#courseStatisticsTableItemContainer").append($el); 
 	}, 
 
-	addCourseStatisticsTableItem = function(id, date, courseCount, activities) {
+	addCourseStatisticsTableItem = function(date, courseCount, activities) {
 		makeCourseStatisticsTableItem({
-			id: id, 
+			id: "courseStatisticsTableItem" + courseStatisticsTableItemCount, 
 			date: date,
 			courseCount: courseCount,
 			activities: activities
@@ -351,29 +284,35 @@ StatisticsModule.StatisticsView = (function() {
 		var item = StatisticsModule.CategoryStatisticsTableItem().init({
 			id: options.id,
 			category: options.category,
-			courseCount: options.courseCount
+			courseCount: options.courseCount,
+			materialsCount: options.materialsCount, 
+			subscriberCount: options.subscriberCount, 
+			trainerCount: options.trainerCount
 		}); 
 		var $el = item.render(); 
 		$("#categoryStatisticsTableItemContainer").append($el); 
 	}, 
 
-	addCategoryStatisticsTableItem = function(id, category, courseCount) {
+	addCategoryStatisticsTableItem = function(category, courseCount, materialsCount, subscriberCount, trainerCount) {
 		makeCategoryStatisticsTableItem({
-			id: id, 
+			id: "categoryStatisticsTableItem" + categoryStatisticsTableItemCount, 
 			category: category,
-			courseCount: courseCount
+			courseCount: courseCount, 
+			materialsCount: materialsCount, 
+			subscriberCount: subscriberCount, 
+			trainerCount: trainerCount
 		});
 	},
 
-
-
-	drawChart = function(object, option) {
-		//var chart, chartContainer;
-		var chartContainer = (option == "login") ? "loginStatisticsChart" : "accessStatisticsChart";
-		/*if (option == "login") {
-			chartContainer = "chartdiv";
-			chart = 
-		}*/
+	initChart = function(object, option) {
+		var chartContainer;
+		if (option == "login") {
+			chartContainer = "loginStatisticsChart";
+		} if (option == "readWrite") {
+			chartContainer = "accessStatisticsChart";
+		} if (option == "loginEnlargement" || option == "readWriteEnlargement") {
+			chartContainer = "enlargementChart";
+		} 
 		var chartData = generateChartData(object, option);
 		var chart = AmCharts.makeChart(chartContainer, {
 		    "type": "serial",
@@ -409,7 +348,7 @@ StatisticsModule.StatisticsView = (function() {
 		        "scrollbarHeight": 40
 		    },
 		    "chartCursor": {
-		       "limitToGraph":"g1"
+		       //"limitToGraph":"g1"
 		    },
 		    "categoryField": "date",
 		    "categoryAxis": {
@@ -422,20 +361,30 @@ StatisticsModule.StatisticsView = (function() {
 		        "enabled": true
 		    }
 		});
-
-		//chart.addListener("rendered", zoomChart);
+		chart.chartCursor.addListener("zoomed", function (event) {
+		        console.log("zoom");
+		    });
 
 		if (option == "login") {
 			loginStatisticsChart = chart;
-		} else {
+		} if (option == "readWrite") {
 			accessStatisticsChart = chart; 
+		} if (option == "loginEnlargement") {
+			enlargementLoginChart = chart;
+		} if (option == "readWriteEnlargement") {
+			enlargementReadWriteChart = chart;
 		}
+	},
+
+	drawChart = function(object, option) {
+		initChart(object, option); 
+		$("#" + option + "ChartEnlargementButton").on('click', {'chartObject': object, 'option': option + "Enlargement"}, onEnlargementButtonClick); 
 	}, 
 
 	generateChartData = function(object, option) {
 		    var chartData = [];
 		    var count;
-		    if (option == "login") {
+		    if (option == "login" || option == "loginEnlargement") {
 		    	count = 0; 
 		    	for (key in object) {
 			    	var visits = object[key]["gesamt"];
@@ -447,7 +396,7 @@ StatisticsModule.StatisticsView = (function() {
 				        visits: visits
 				    });
 			    }
-		    } else if (option == "readWrite") {
+		    } else if (option == "readWrite" || option == "readWriteEnlargement") {
 		    	count = 0; 
 		    	var dozent = object["dozent"]; 
 		    	var student = object["student"];

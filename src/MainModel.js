@@ -4,7 +4,6 @@ StatisticsModule.MainModel = (function() {
 	spinner, 
 
 	init = function() {
-		//getGripsHeader(); 
 		$("#loadingOverlay").width($("body").width());
 		$("#loadingOverlay").height($("body").height());
 		getCourseData();
@@ -57,13 +56,6 @@ StatisticsModule.MainModel = (function() {
 		$("body").css("overflow-y", "hidden");
 		$("#loadingOverlay").show(); 
 		spinner.spin(spinnerOverlay);
-	}, 
-
-	getGripsHeader = function() {
-		$.get("src/php/functions.php?command=getGripsHeader").done(
-		function(data) {
-			$("body").prepend(data); 
-		}); 
 	}, 
 
 	getCourseData = function() {

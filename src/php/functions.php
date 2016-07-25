@@ -1,58 +1,7 @@
 <?php 
     require_once('../../../config.php');
 
-    /*$colornames = Array (
-        'c_13' => array(114,75,81),// Zentrum für Sprache und Kommunikation (ZSK)
-        'c_83' => array(3,35,82),   // Rechenzentrum
-        'c_101' => array(174,167,0), // Wirtschaftswissenschaften
-        'c_121' => array(255, 255, 255), //Verschiedenes
-        'c_178' => array(205,211,15), // Rechtswissenschaft
-        'c_202' => array(191,0,42),  //Psychologie, Pädagogik und Sport
-        'c_208' => array(156,0,75), //Sprach-, Literatur- und Kulturwissenschaften
-        'c_215' => array(236,188,0), // Katholische Theologie
-        'c_227' => array(0,155,119), // Mathematik
-        'c_228' => array(0,137,147), // Physik
-        'c_229' => array (79,184,0), // Biologie und Vorklinische Medizin
-        'c_230' => array (0,135,178),  //Chemie und Pharmazie
-        'c_231' => array(0,85,106), //Medizin
-        'c_315' => array(236,98,0), // Philosophie, Kunst-, Geschichts- und Gesellschaftswissenschaften
-        'c_638' => array(61,65,0), // Akademisches Auslandsamt [id] => 638 )
-        'c_845' => array(0,0,0), //Forschungsinitiativen
-        'c_849' => array(95,0,47), //Koordinationsstelle Chancengleichheit & Familie
-        'c_892' => array(33,33,33), // Hochschule Regensburg
-        'c_932' => array(66,66,66), // Studierendenvertretung)
-        'c_1474' => array(59,0,65), //Zentrum für Hochschul- und Wissenschaftsdidaktik (ZHW)
-        'c_2209' => array(29,63,75) //FUTUR - Forschungs- Und Technologietransfer Universität Regensburg
-    );*/
-    
-    $colors = array(
-        'c_13' => "rgb(114,75,81)",// Zentrum für Sprache und Kommunikation (ZSK)
-        'c_83' => "rgb(3,35,82)",   // Rechenzentrum
-        'c_101' => "rgb(174,167,0)", // Wirtschaftswissenschaften
-        'c_121' => "rgb(255, 255, 255)", //Verschiedenes
-        'c_178' => "rgb(205,211,15)", // Rechtswissenschaft
-        'c_202' => "rgb(191,0,42)",  //Psychologie, Pädagogik und Sport
-        'c_208' => "rgb(156,0,75)", //Sprach-, Literatur- und Kulturwissenschaften
-        'c_215' => "rgb(236,188,0)", // Katholische Theologie
-        'c_227' => "rgb(0,155,119)", // Mathematik
-        'c_228' => "rgb(0,137,147)", // Physik
-        'c_229' => "rgb(79,184,0)", // Biologie und Vorklinische Medizin
-        'c_230' => "rgb(0,135,178)",  //Chemie und Pharmazie
-        'c_231' => "rgb(0,85,106)", //Medizin
-        'c_315' => "rgb(236,98,0)", // Philosophie, Kunst-, Geschichts- und Gesellschaftswissenschaften
-        'c_638' => "rgb(61,65,0)", // Akademisches Auslandsamt [id] => 638 )
-        'c_845' => "rgb(0,0,0)", //Forschungsinitiativen
-        'c_849' => "rgb(95,0,47)", //Koordinationsstelle Chancengleichheit & Familie
-        'c_892' => "rgb(33,33,33)", // Hochschule Regensburg
-        'c_932' => "rgb(66,66,66)", // Studierendenvertretung)
-        'c_1474' => "rgb(59,0,65)", //Zentrum für Hochschul- und Wissenschaftsdidaktik (ZHW)
-        'c_2209' => "rgb(29,63,75)" //FUTUR - Forschungs- Und Technologietransfer Universität Regensburg
-    );
-
     switch($_GET['command']) {
-        case 'getGripsHeader': 
-            getGripsHeader();
-            break;
         case 'getLoginCount':
             getLoginCount(); 
             break; 
@@ -64,38 +13,6 @@
             break;
         default: 
             return; 
-    }
-
-    function getGripsHeader() {
-        global $PAGE;
-        global $OUTPUT;
-        require_login(0, false);
-        $context = context_system::instance();
-        require_capability('moodle/site:config', $context);
-        $PAGE->set_context($context);
-        $PAGE->set_title("GRIPS - Monatsstatistik");
-        $PAGE->set_url('/blocks/stats/monthlystats/index.php'); //WARNING FIX
-        $PAGE->set_context(context_system::instance());
-
-
-        //Ausgabe der Seite
-        $PAGE->navbar->add(get_string('logins', 'block_stats'), null);
-        //print_header(get_string('logins', 'block_stats'), get_string('logins', 'block_stats'), $navigation, $mform->focus());
-
-        $OUTPUT->heading(get_string('logins', 'block_stats'));
-        //print_heading(get_string('logins', 'block_stats'));
-
-        echo $OUTPUT->header();
-        //print_header(get_string('logins', 'block_stats'), get_string('logins', 'block_stats'), $navigation, $mform->focus());
-
-        echo $OUTPUT->box_start('generalbox');
-        //print_box_start('generalbox');
-
-        echo $OUTPUT->box_end();
-        //print_box_end();
-
-        echo $OUTPUT->footer();
-        //print_footer();
     }
 
     function getCourseData() {  
@@ -232,19 +149,21 @@
         $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
         $categories = $DB->get_records_sql($sql);
 
-        //Die Userzahlen für die Kategorien aufsummieren.
         $statsdata = array();
         $courseidsstr = array();
         foreach ($courseids as $maincategory => $courseid) {
             $courseidstr[$maincategory] = "(".implode(",", $courseid).")";
-            $sql = "SELECT '$maincategory' as category, '".count($courseid)."' as kurse, ".
+            $sql = "SELECT '$maincategory' as category, '".count($courseid)."' as courses, ".
                     "sum(teilnahmen) as teilnahmen, sum(kursleitungen) as kursleitungen ".
                     "FROM mdl_tmp_stats_coursecounts ".
                     "WHERE courseid in {$courseidstr[$maincategory]} ";
             if(array_key_exists("c_".$maincategory, $colors)) {
-                $statsdata[$maincategory] = $DB->get_records_sql($sql);
+                $statsdata[$maincategory]["courses"] = $DB->get_records_sql($sql)["".$maincategory]->courses;
                 $statsdata[$maincategory]["color"] = $colors["c_".$maincategory];
                 $statsdata[$maincategory]["name"] = $categories["".$maincategory]->name;
+                $statsdata[$maincategory]["trainer"] = getTrainerCount($courseidstr[$maincategory]);
+                $statsdata[$maincategory]["subscriber"] = getSubscriberCount($courseidstr[$maincategory]);
+                $statsdata[$maincategory]["materials"] = getMaterialsCount($courseidstr[$maincategory]);
             }
         }
 
@@ -277,6 +196,37 @@
                 $parents[$record->id] = array();
             }
         }
+    }
+
+    function getSubscriberCount($courseids) {
+        global $DB;
+        $sql = "SELECT count(DISTINCT userid) as count ".
+                "FROM mdl_role_assignments ra ".
+                "JOIN mdl_context ctx ON ctx.id = ra.contextid ".
+                "JOIN mdl_tmp_stats_activecourses ac ON ctx.instanceid = ac.courseid ".
+                "WHERE (ra.roleid not in (1, 2, 3, 4, 8, 10 ,11,12,14,16)) ".
+                "AND ctx.instanceid in $courseids";
+        $count = $DB->get_record_sql($sql);
+
+        return $count->count;
+    }
+
+    function getTrainerCount($courseids) {
+        global $DB;
+        $sql = "SELECT count(DISTINCT userid) as count ".
+                "FROM mdl_role_assignments ra ".
+                "JOIN mdl_context ctx ON ctx.id = ra.contextid ".
+                "JOIN mdl_tmp_stats_activecourses ac ON ctx.instanceid = ac.courseid ".
+                "WHERE (ra.roleid in (1, 2, 3, 4, 8, 10 ,11,12,14,16)) ".
+                "AND ctx.instanceid in $courseids";
+        $count = $DB->get_record_sql($sql);
+        return $count->count;
+    }
+
+    function getMaterialsCount($courseids) {
+        global $DB;
+        $count = $DB->count_records_select('resource', "course in {$courseids}");
+        return $count;
     }
 
     function getLoginCount() {
