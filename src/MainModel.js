@@ -6,11 +6,11 @@ StatisticsModule.MainModel = (function() {
 	init = function() {
 		$("#loadingOverlay").width($("body").width());
 		$("#loadingOverlay").height($("body").height());
-		getCourseData();
 		initSpinner(); 
 		startSpinner();
 		getLoginStatistics();
 		getReadWriteData();  
+		getCourseData();
 		return that; 
 	}, 
 
@@ -64,7 +64,8 @@ StatisticsModule.MainModel = (function() {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
 			console.log(object); 
-			$(that).trigger('addTagCloud', object); 
+			$(that).trigger('addTagCloud', object);
+			stopSpinner(); 
 		}); 
 	}, 
 
@@ -83,7 +84,6 @@ StatisticsModule.MainModel = (function() {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
 			$(that).trigger('drawChart', [object, "readWrite"]);
-			stopSpinner();
 		}); 
 	}; 
 
