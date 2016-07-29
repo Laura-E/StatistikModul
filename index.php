@@ -151,7 +151,7 @@
         require_capability('moodle/site:config', $context);
         $PAGE->set_context($context);
         $PAGE->set_title("Statistikmodul");
-        $PAGE->set_url('/StatisticsModule/index.php'); //WARNING FIX
+        $PAGE->set_url('/StatisticsModule/index.php'); 
         //$PAGE->set_pagelayout('frontpage');
         $PAGE->set_context(context_system::instance());
 
