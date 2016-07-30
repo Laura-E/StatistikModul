@@ -18,6 +18,11 @@ StatisticsModule.StatisticsView = (function() {
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
 		$("#categoryStatisticsMoreButton").on('click', onCategoryStatisticsMoreButtonClick); 
+		$("#courseStatisticsModalPrint").on('click', onCourseStatisticsModalPrintClick);
+		$("#categoryStatisticsModalPrint").on('click', onCategoryStatisticsModalPrintClick);
+		$("#accessStatisticsModalPrint").on('click', onAccessStatisticsModalPrintClick);
+		$("#loginStatisticsModalPrint").on('click', onLoginStatisticsModalPrintClick);
+		$("#chartEnlargementModalPrint").on('click', onChartEnlargementModalPrintClick);
 		return that; 
 	}, 
 
@@ -50,7 +55,53 @@ StatisticsModule.StatisticsView = (function() {
 
 	onLoginStatisticsMoreButtonClick = function(event) {
 		$("#loginStatisticsModal").modal('show'); 
-	}, 
+	},
+
+	onCourseStatisticsModalPrintClick = function(event){
+		
+		printElement("courseStatisticsModal");		
+	} 
+
+	onCategoryStatisticsModalPrintClick = function(event){
+		
+		//printElement("categoryStatisticsModal");
+		var content = document.getElementById("categoryStatisticsModal");
+		var pri = document.getElementById("ifmcontentstoprint").contentWindow;
+		pri.document.open();
+		pri.document.write(content.innerHTML);
+		var piechart = pri.document.getElementById("coursePie");
+		piechart.parentNode.removeChild(piechart);
+		pri.document.close();
+		pri.focus();
+		pri.print();
+		window.focus();		
+	}
+
+	onAccessStatisticsModalPrintClick = function(event){
+		
+		printElement("accessStatisticsModal");		
+	}
+
+	onLoginStatisticsModalPrintClick = function(event){
+		
+		printElement("loginStatisticsModal");		
+	}
+
+	onChartEnlargementModalPrintClick = function(event){		
+		
+		printElement("chartEnlargementModal");	
+	}
+	printElement = function(el){
+
+		var content = document.getElementById(el);
+		var pri = document.getElementById("ifmcontentstoprint").contentWindow;
+		pri.document.open();
+		pri.document.write(content.innerHTML);
+		pri.document.close();
+		pri.focus();
+		pri.print();
+		window.focus();
+	}
 
 	addTagCloud = function(object) {
 		var words = [];

@@ -150,6 +150,17 @@ body {
 	text-decoration: underline;
 }
 
+.print {
+	background: none;
+    border: none;
+    float: right;
+    vertical-align: middle;
+    padding: 0px;
+    text-decoration: underline;
+    cursor: pointer;
+    width: 50px;
+}
+
 #coursePie {
 	height: 500px;
 }
