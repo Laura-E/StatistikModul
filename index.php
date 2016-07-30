@@ -27,6 +27,8 @@
                     <h4 class="modal-title" id="loginStatisticsTableTitle">Chart</h4>
                 </div>
                 <div class="modal-body">
+                    <button class="btn btn-default chartTypeButton" id="lineChartButton"><img src="res/images/line_chart.png" /></button>
+                    <button class="btn btn-default chartTypeButton" id="barChartButton"><img src="res/images/bar_chart.png" /></button>
                     <div id="enlargementChart"></div>    
                 </div>
             </div>
@@ -156,7 +158,7 @@
         require_capability('moodle/site:config', $context);
         $PAGE->set_context($context);
         $PAGE->set_title("Statistikmodul");
-        $PAGE->set_url('/StatisticsModule/index.php'); //WARNING FIX
+        $PAGE->set_url('/StatisticsModule/index.php'); 
         //$PAGE->set_pagelayout('frontpage');
         $PAGE->set_context(context_system::instance());
 
@@ -172,61 +174,60 @@
 
      ?>
         <div class="container">
-            <div class="box" id="optionsBox">
-                <div class="title">OPTIONEN</div>
-
-                <div id="options">
-                    <!---<button class="btn btn-default" id="lastWeekBtn">letzte Woche</button>
-                    <button class="btn btn-default" id="yesterdayBtn">gestern</button>
-                    <button class="btn btn-default" id="todayBtn">heute</button>-->
-                    <div>Zeitraum: </div>
-                    <div id="slider-range"></div>
-                    <input name="startDate" id="startDate" class="date-picker" readOnly />
-                    <input name="endDate" id="endDate" class="date-picker" readOnly />
-                </div>
-            </div>
-            <br />
-            <div class="row" id="numbers">
-                <div class="col-md-4">
-                    <div class="title box"><div>Zugriffe</div><br /><div class="number">13,937</div></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="title box"><div>Logins</div><br /><div class="number">530</div></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="title box"><div>Aktive Kurse</div><br /><div class="number">4,885</div></div>
-                </div>
-            </div>
-            <br />
-            <div class="row">
-                <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Zugriffs-Statistik<span id="readWriteChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="accessStatisticsMoreButton">mehr</div></div>
-                    <div class="innerBox"><div id="accessStatisticsChart"></div></div>
-                </div>
-                <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Kursbereichs-Statistik<div class="more" id="categoryStatisticsMoreButton">mehr</div></div>
-                    <div class="innerBox"><div id="tagcloud"></div></div>
-                </div>
-                <!--<div class="col-xs-6 col-md-4 box">
-                    <div class="title">Betriebssysteme<div class="more">mehr</div></div>
-                    <div class="innerBox"><div id="OSChart"></div></div>
-                </div>-->
-                <!--<div class="col-xs-6 col-md-4 box">
-                    <div class="title">Browser<div class="more">mehr</div></div>
-                    <div class="innerBox"><div id="browserChart"></div></div>
-                </div>-->
-            </div>
-            <div class="row">
-                <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Login-Statistik<span id="loginChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="loginStatisticsMoreButton">mehr</div></div>
-                    <div class="innerBox"><div id="loginStatisticsChart"></div></div>
-                </div>
-                <div class="col-xs-9 col-md-6 box">
-                    <div class="title">Kurs-Statistik<span class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
-                    <div class="innerBox"><div id="tagcloud"></div></div>
-                </div>
-            </div>
             
+
+            <ul class="nav nav-tabs nav-justified" id="StatisticsTabs">
+                <li id="monthlyStatsTab" role="presentation" class="active"><a href="#monthlyStats" aria-controls="monthlyStats" role="tab" data-toggle="tab">Monatsstatistik</a></li>
+                <li id="categoryStatsTab" role="presentation"><a href="#categoryStats" aria-controls="categoryStats" role="tab" data-toggle="tab">Kursbereichsstatistik</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="monthlyStats">
+
+
+                    <div class="box" id="optionsBox">
+                        <div class="title">OPTIONEN</div>
+
+                        <div id="options">
+                            <div>Zeitraum: </div>
+                            <div id="slider-range"></div>
+                            <input name="startDate" id="startDate" class="date-picker" readOnly />
+                            <input name="endDate" id="endDate" class="date-picker" readOnly />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row" id="numbers">
+                        <div class="col-md-4">
+                            <div class="title box"><div>Zugriffe</div><br /><div class="number">13,937</div></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="title box"><div>Logins</div><br /><div class="number">530</div></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="title box"><div>Aktive Kurse</div><br /><div class="number">4,885</div></div>
+                        </div>
+                    </div>
+                    <br />
+                        <div class="box">
+                            <div class="title">Zugriffs-Statistik<span id="readWriteChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="accessStatisticsMoreButton">mehr</div></div>
+                            <div class="innerBox"><div id="accessStatisticsChart"></div></div>
+                        </div>
+                        <div class="box">
+                            <div class="title">Login-Statistik<span id="loginChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="loginStatisticsMoreButton">mehr</div></div>
+                            <div class="innerBox"><div id="loginStatisticsChart"></div></div>
+                        </div>
+                        <div class="box">
+                            <div class="title">Kurs-Statistik<span class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
+                            <div class="innerBox"></div>
+                        </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="categoryStats">
+                    <div class="box">
+                        <div class="title">Kursbereichs-Statistik<div class="more" id="categoryStatisticsMoreButton">mehr</div></div>
+                        <div class="innerBox"><div id="tagcloud" style="width: 550px; height: 350px;"></div></div>
+                    </div>
+                </div>
+            </div>
 
         </div>
 

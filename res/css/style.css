@@ -17,11 +17,30 @@ body {
 
 .container {
 	width: 100% !important;
+	margin: 0px !important;
+	padding: 0px !important;
 }
+
+#StatisticsTabs {
+	margin: 0px !important;
+}
+
+#StatisticsTabs a {
+	margin: 0px !important;
+}
+
 .box {
 	border-radius: 2px; 
 	border: 1px solid #ccc;
 	padding: 0px !important;
+}
+
+.chartTypeButton {
+	float: right;
+}
+
+.chartTypeButton img {
+    width: 20px !important;
 }
 
 .number {
@@ -56,6 +75,7 @@ body {
 
 #optionsBox {
 	width: 470px;
+	margin: 20px auto;
 }
 
 .title {
@@ -63,6 +83,10 @@ body {
 	background-color: #ddd;
 	padding: 5px 20px;
 	font-weight: bold;
+}
+
+div.jqcloud {
+	overflow: visible;
 }
 
 #sliderValue {
@@ -81,16 +105,20 @@ body {
 
 #tagcloud span {
 	cursor: default;
-	color: #333;
+	/*color: #333;*/
+}
+
+.row {
+	margin: 0px !important;
 }
 
 #tagcloud {
-	height: 250px;
-    width: 250px;
-    text-align: center;
-    vertical-align: middle;
+	/*height: 370px;
+    width: 570px;*/
+    /*text-align: center;
+    vertical-align: middle;*/
     padding: 10px;
-    float: left;
+    margin: 0 auto;
 }
 
 .ui-rangeSlider-range {

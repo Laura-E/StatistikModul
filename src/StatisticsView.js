@@ -18,13 +18,26 @@ StatisticsModule.StatisticsView = (function() {
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
 		$("#categoryStatisticsMoreButton").on('click', onCategoryStatisticsMoreButtonClick); 
+
 		$("#courseStatisticsModalPrint").on('click', onCourseStatisticsModalPrintClick);
 		$("#categoryStatisticsModalPrint").on('click', onCategoryStatisticsModalPrintClick);
 		$("#accessStatisticsModalPrint").on('click', onAccessStatisticsModalPrintClick);
 		$("#loginStatisticsModalPrint").on('click', onLoginStatisticsModalPrintClick);
 		$("#chartEnlargementModalPrint").on('click', onChartEnlargementModalPrintClick);
+
+		$("#lineChartButton").on('click', onLineChartButtonClick); 
+		$("#barChartButton").on('click', onBarChartButtonClick); 
+
 		return that; 
 	}, 
+
+	onLineChartButtonClick = function(event) {
+		setChartType(enlargementReadWriteChart, "line");
+	}, 
+
+	onBarChartButtonClick = function(event) {
+		setChartType(enlargementReadWriteChart, "column");
+	},
 
 	onEnlargementButtonClick = function(event) {
 		$("#chartEnlargementModal").modal('show');
@@ -122,14 +135,16 @@ StatisticsModule.StatisticsView = (function() {
 			word['trainer'] = trainer;
 			words.push(word); 
 		}
-		initCloud(words); 
+		$("#categoryStatsTab").on("click", {"words": words}, onCategoryStatsTabClick);
+		//initCloud(words); 
+	}, 
+	onCategoryStatsTabClick = function(event) {
+		initCloud(event.data.words);
 	}, 
 
 	initCloud = function(words) {
 
 		$("#tagcloud").jQCloud(words, {
-	      	width: 550,
-	      	height: 350, 
 	      	autoResize: true, 
 	      	removeOverflowing: false, 
 	      	fontSize: {
@@ -414,7 +429,8 @@ StatisticsModule.StatisticsView = (function() {
 		});
 		chart.chartCursor.addListener("zoomed", function (event) {
 		        console.log("zoom");
-		    });
+		});
+
 
 		if (option == "login") {
 			loginStatisticsChart = chart;
@@ -425,6 +441,29 @@ StatisticsModule.StatisticsView = (function() {
 		} if (option == "readWriteEnlargement") {
 			enlargementReadWriteChart = chart;
 		}
+	},
+
+	setChartType = function(chart, type) {
+	    switch(type) {
+	        case 'line':
+	            chart.graphs[0].type = 'line';
+	            chart.graphs[0].lineAlpha = 1;
+	            chart.graphs[0].fillAlphas = 0;
+	            chart.validateNow();
+	            break;
+	        /*case 'area':
+	            chart.graphs[0].type = 'line';
+	            chart.graphs[0].lineAlpha = 1;
+	            chart.graphs[0].fillAlphas = 0.3;
+	            chart.validateNow();
+	            break;*/
+	        case 'column':
+	            chart.graphs[0].type = 'column';
+	            chart.graphs[0].lineAlpha = 0;
+	            chart.graphs[0].fillAlphas = 0.5;
+	            chart.validateNow();
+	            break;
+	    }
 	},
 
 	drawChart = function(object, option) {
@@ -469,6 +508,7 @@ StatisticsModule.StatisticsView = (function() {
 		changeZoomDates = function(chart) {
 		    var startDate = $("#startDate").datepicker('getDate');
 		    var endDate = $("#endDate").datepicker('getDate');
+		    console.log(startDate, endDate); 
 		    chart.zoomToDates(startDate, endDate);
 		}, 
 
