@@ -1,9 +1,48 @@
 <?php 
 
     require_once('../../../config.php');
-    getCourseData(); 
+    getCounts("1277935200", "1343772000"); 
 
-    function getCourseData() {  
+    function getCourseData() {
+        global $DB;
+        $sql = "SELECT sm2.timeend as timeend, DATE_FORMAT(FROM_UNIXTIME(timeend), '%m.%Y') AS 'date_formatted',
+                (SELECT count(DISTINCT courseid) FROM `mdl_stats_monthly` sm1 
+                where sm1.timeend = sm2.timeend and stattype <>'enrolments') as anzahl
+                , (sum(sm2.stat1) + sum(sm2.stat2)) as aktivitaeten
+                FROM `mdl_stats_monthly` sm2 group by sm2.timeend order by sm2.timeend asc";
+
+        $statsdata = $DB->get_records_sql($sql);
+        echo json_encode($statsdata);
+    }
+
+    function getCounts($start, $end) {
+        global $DB;
+        $counts = array();
+        $sqlLogin = "SELECT (sum(stat1) + sum(stat2)) as count
+                  FROM `mdl_stats_monthly` 
+                  where stattype = 'logins' 
+                  AND timeend >= $start
+                  AND timeend <= $end";
+        $loginResult = $DB->get_record_sql($sqlLogin); 
+        $counts["loginCount"] = $loginResult->count; 
+
+        $sqlReadWrite = "SELECT sum(stat1) as count
+                  FROM `mdl_stats_monthly` 
+                  WHERE stattype = 'activity'
+                  AND timeend >= $start
+                  AND timeend <= $end";
+        $readWriteResult = $DB->get_record_sql($sqlReadWrite); 
+        $counts["readWriteCount"] = $readWriteResult->count; 
+
+        $sqlCourse = "SELECT count(DISTINCT courseid) as anzahl FROM `mdl_stats_monthly`
+                where stattype = 'enrolments' 
+                AND timeend <= $end";
+        $courseResult = $DB->get_record_sql($sqlCourse); 
+        $counts["courseCount"] = $readWriteResult->count; 
+        echo json_encode($counts);
+    }
+
+    function getCourseData2() {  
     global $DB; 
         $startwhere = "";
         $endwhere = "";

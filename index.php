@@ -191,13 +191,13 @@
                     <br />
                     <div class="row" id="numbers">
                         <div class="col-md-4">
-                            <div class="title box"><div>Zugriffe</div><br /><div class="number">13,937</div></div>
+                            <div class="title box"><div>Zugriffe</div><br /><div class="number" id="readWriteCount"></div></div>
                         </div>
                         <div class="col-md-4">
-                            <div class="title box"><div>Logins</div><br /><div class="number">530</div></div>
+                            <div class="title box"><div>Logins</div><br /><div class="number" id="loginCount"></div></div>
                         </div>
                         <div class="col-md-4">
-                            <div class="title box"><div>Aktive Kurse</div><br /><div class="number">4,885</div></div>
+                            <div class="title box"><div>Aktive Kurse</div><br /><div class="number" id="courseCount"></div></div>
                         </div>
                     </div>
                     <br />
@@ -210,8 +210,8 @@
                             <div class="innerBox"><div id="loginStatisticsChart"></div></div>
                         </div>
                         <div class="box">
-                            <div class="title">Kurs-Statistik<span class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
-                            <div class="innerBox"></div>
+                            <div class="title">Kurs-Statistik<span id="courseChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
+                            <div class="innerBox"><div id="courseStatisticsChart"></div></div>
                         </div>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="categoryStats">
@@ -219,6 +219,9 @@
                         <div class="title">Kursbereichs-Statistik<div class="more" id="categoryStatisticsMoreButton">mehr</div></div>
                         <div class="innerBox"><div id="tagcloud" style="width: 550px; height: 350px;"></div></div>
                     </div>
+                    <!--<ul class="list-group" id="categoryList">
+                    </ul>-->
+                    <div class="panel-group" id="categoryList"></div>
                 </div>
             </div>
 
@@ -235,42 +238,66 @@
 
         ?>
 
-    <script type="text/html" id="loginStatisticsTableItem-tpl">
-        <tr id="<%= id %>">
-            <td><%= date %></td>
-            <td><%= logins %></td>
-            <td><%= singleLogins %></td>
-            <td><%= allLogins %></td>
-        </tr>
-    </script>
+        <script type="text/html" id="loginStatisticsTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= date %></td>
+                <td><%= logins %></td>
+                <td><%= singleLogins %></td>
+                <td><%= allLogins %></td>
+            </tr>
+        </script>
 
-    <script type="text/html" id="courseStatisticsTableItem-tpl">
-        <tr id="<%= id %>">
-            <td><%= date %></td>
-            <td><%= courseCount %></td>
-            <td><%= activities %></td>
-        </tr>
-    </script>
+        <script type="text/html" id="courseStatisticsTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= date %></td>
+                <td><%= courseCount %></td>
+                <td><%= activities %></td>
+            </tr>
+        </script>
 
-    <script type="text/html" id="accessStatisticsTableItem-tpl">
-        <tr id="<%= id %>">
-            <td><%= date %></td>
-            <td><%= loginLecturers %></td>
-            <td><%= loginOthers %></td>
-            <td><%= contributionLecturers %></td>
-            <td><%= contributionOthers %></td>
-        </tr>
-    </script>
+        <script type="text/html" id="accessStatisticsTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= date %></td>
+                <td><%= loginLecturers %></td>
+                <td><%= loginOthers %></td>
+                <td><%= contributionLecturers %></td>
+                <td><%= contributionOthers %></td>
+            </tr>
+        </script>
 
-    <script type="text/html" id="categoryStatisticsTableItem-tpl">
-        <tr id="<%= id %>">
-            <td><%= category %></td>
-            <td><%= courseCount %></td>
-            <td><%= materialsCount %></td>
-            <td><%= subscriberCount %></td>
-            <td><%= trainerCount %></td>
-        </tr>
-    </script>
+        <script type="text/html" id="categoryStatisticsTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= category %></td>
+                <td><%= courseCount %></td>
+                <td><%= materialsCount %></td>
+                <td><%= subscriberCount %></td>
+                <td><%= trainerCount %></td>
+            </tr>
+        </script>
+
+        <script type="text/html" id="categoryListItem-tpl">
+            <div class="panel panel-default" id="<%= id %>">
+            <a href="#<%= collapseId %>" div class="panel-heading" data-toggle="collapse" data-parent="#categoryList">
+                <div class="panel-title">
+                    <div class="colorStripe" style="background-color:<%= backgroundColor %>;"></div>
+                    <p class="categoryTitle"><%= title %></p>
+                </div>
+            </a>
+            <div id="<%= collapseId %>" class="panel-collapse collapse courseOfStudiesCollapse">
+                <ul class="list-group fileList" id="collectionUl">
+                </ul>
+            </div>
+        </div>
+        </script>
+<!--<li class="list-group-item categoryListItem" id="<%= id %>">
+                <div class="colorStripe" style="background-color:<%= backgroundColor %>;"></div>
+                <p class="categoryTitle"><%= title %></p>
+            </li>-->
+        <script type="text/html" id="courseOfStudiesListItem-tpl">
+            <li class="list-group-item" id="<%= id %>" tabindex="1">
+                <span class="courseOfStudiesTitle"><%= title %></span> 
+            </li>
+        </script>
 
         <script type="text/javascript" src="libs/jquery-2.1.4.js"></script>
         <script type="text/javascript" src="libs/underscore.js"></script>
@@ -312,6 +339,7 @@
         <script src="src/CourseStatisticsTableItem.js"></script>
         <script src="src/AccessStatisticsTableItem.js"></script>
         <script src="src/CategoryStatisticsTableItem.js"></script>
+        <script src="src/CategoryListItem.js"></script>
 
         <script>
             StatisticsModule.init();    

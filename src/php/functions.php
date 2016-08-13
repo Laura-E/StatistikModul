@@ -2,20 +2,83 @@
     require_once('../../../config.php');
 
     switch($_GET['command']) {
+        case 'getMinAndMaxDate':
+            getMinAndMaxDate(); 
+            break;
         case 'getLoginCount':
             getLoginCount(); 
             break; 
         case 'getReadWriteData': 
             getReadWriteData(); 
             break;
-        case 'getCourseData': 
+        case 'getCourseData':
             getCourseData(); 
             break;
+        case 'getCategoryData': 
+            getCategoryData(); 
+            break;
+        case 'getCounts':
+            $start = $_GET['start']; 
+            $end = $_GET['end']; 
+            getCounts($start, $end); 
         default: 
             return; 
     }
 
-    function getCourseData() {  
+    function getMinAndMaxDate() {
+        global $DB;
+        //SELECT DATE_FORMAT(FROM_UNIXTIME(min(timeend)), '%m.%Y') AS min, DATE_FORMAT(FROM_UNIXTIME(max(timeend)), '%m.%Y') AS max
+        $sql = "SELECT min(timeend) AS min, max(timeend) AS max
+                FROM `mdl_stats_monthly`";
+
+        $statsdata = $DB->get_record_sql($sql);
+        echo json_encode($statsdata);
+    }
+
+    function getCourseData() {
+        global $DB;
+        $sql = "SELECT sm2.timeend as timeend, DATE_FORMAT(FROM_UNIXTIME(timeend), '%m.%Y') AS 'date_formatted',
+                (SELECT count(DISTINCT courseid) FROM `mdl_stats_monthly` sm1 
+                where sm1.timeend = sm2.timeend and stattype <>'enrolments') as anzahl
+                , (sum(sm2.stat1) + sum(sm2.stat2)) as aktivitaeten
+                FROM `mdl_stats_monthly` sm2 group by sm2.timeend order by sm2.timeend asc";
+
+        $statsdata = $DB->get_records_sql($sql);
+        echo json_encode($statsdata);
+    }
+
+    function getCounts($start, $end) {
+        global $DB;
+        $counts = array();
+        $sqlLogin = "SELECT (sum(stat1) + sum(stat2)) as count
+                FROM `mdl_stats_monthly` 
+                where stattype = 'logins' 
+                AND timeend >= $start
+                AND timeend <= $end";
+        $loginResult = $DB->get_record_sql($sqlLogin); 
+        $counts["loginCount"] = $loginResult->count; 
+
+        $sqlReadWrite = "SELECT sum(stat1) as count
+                FROM `mdl_stats_monthly` 
+                WHERE stattype = 'activity'
+                AND timeend >= $start
+                AND timeend <= $end";
+        $readWriteResult = $DB->get_record_sql($sqlReadWrite); 
+        $counts["readWriteCount"] = $readWriteResult->count; 
+        $intEnd = intval($end);
+        $sqlCourse = "SELECT sm2.timeend as timeend, DATE_FORMAT(FROM_UNIXTIME(timeend), '%m.%Y') AS 'date_formatted', 
+                (SELECT count(DISTINCT courseid) FROM `mdl_stats_monthly` sm1 
+                where sm1.timeend = sm2.timeend 
+                and stattype <>'enrolments') as count, 
+                (sum(sm2.stat1) + sum(sm2.stat2)) as aktivitaeten 
+                FROM `mdl_stats_monthly` sm2 where sm2.timeend = ".$end;
+        $courseResult = $DB->get_record_sql($sqlCourse); 
+        $counts["courseCount"] = $courseResult->count; 
+        $counts["end"] = intval($end); 
+        echo json_encode($counts);
+    }
+
+    function getCategoryData() {  
     global $DB; 
         $startwhere = "";
         $endwhere = "";
@@ -207,7 +270,6 @@
                 "WHERE (ra.roleid not in (1, 2, 3, 4, 8, 10 ,11,12,14,16)) ".
                 "AND ctx.instanceid in $courseids";
         $count = $DB->get_record_sql($sql);
-
         return $count->count;
     }
 
@@ -231,12 +293,9 @@
 
     function getLoginCount() {
         global $DB;
-        //$startwhere = " and ".strtotime("20.05.2015")."< timeend ";
-        $startwhere = "";  // , DATE_FORMAT(FROM_UNIXTIME(timeend), '%d.%m.%Y') AS 'date_formatted'
-        $endwhere  = "";
         $sql = "SELECT timeend, sum(stat1) as logins, sum(stat2) as singlelogins, (sum(stat1) + sum(stat2)) as gesamt, DATE_FORMAT(FROM_UNIXTIME(timeend), '%m.%Y') AS 'date_formatted'
                   FROM `mdl_stats_monthly` 
-                  where stattype = 'logins' $startwhere $endwhere 
+                  where stattype = 'logins' 
                   group by timeend order by timeend asc";
 
         echo json_encode($DB->get_records_sql($sql));

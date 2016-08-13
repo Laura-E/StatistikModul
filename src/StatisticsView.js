@@ -3,17 +3,20 @@ StatisticsModule.StatisticsView = (function() {
 	timeperiodSlider, 
 	loginStatisticsChart, 
 	accessStatisticsChart, 
+	courseStatisticsChart, 
 	enlargementLoginChart, 
 	enlargementReadWriteChart,
+	enlargementCourseChart, 
 	accessStatisticsTableItemCount = 0, 
 	loginStatisticsTableItemCount = 0, 
 	courseStatisticsTableItemCount = 0, 
 	categoryStatisticsTableItemCount = 0, 
-	
+	categoryListItemCount = 0, 
+	started = 0, 
+
 	init = function() {
-     	initSlider(); 
-     	initDatePicker(); 
-		addCourseStatisticsTableItem(23, "234", "54");
+     	/*initSlider(); 
+     	initDatePicker(); */
 		$("#loginStatisticsMoreButton").on('click', onLoginStatisticsMoreButtonClick); 
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
@@ -22,24 +25,44 @@ StatisticsModule.StatisticsView = (function() {
 		$("#barChartButton").on('click', onBarChartButtonClick); 
 		return that; 
 	}, 
+	initTimePeriod = function(object) {
+		var min = parseInt(object["min"]);
+		var max = parseInt(object["max"]);
+		initSlider(min, max); 
+     	initDatePicker(min, max); 
+	}, 
 
 	onLineChartButtonClick = function(event) {
-		setChartType(enlargementReadWriteChart, "line");
+		var option = $("#enlargementChart").attr("data-id");
+		var chart = getChartByString(option);
+		setChartType(chart, "line");
 	}, 
 
 	onBarChartButtonClick = function(event) {
-		setChartType(enlargementReadWriteChart, "column");
+		var option = $("#enlargementChart").attr("data-id");
+		var chart = getChartByString(option);
+		setChartType(chart, "column");
 	},
+
+	getChartByString = function(option) {
+		var chart; 
+		if (option == "loginEnlargement") {
+			chart = enlargementLoginChart; 
+		} else if (option == "readWriteEnlargement") {
+			chart = enlargementReadWriteChart;
+		} else if (option == "courseEnlargement") {
+			chart = enlargementCourseChart;
+		}
+		return chart; 
+	}, 
 
 	onEnlargementButtonClick = function(event) {
 		$("#chartEnlargementModal").modal('show');
 		var option = event.data.option;
 		initChart(event.data.chartObject, option); 
-		if (option == "loginEnlargement") {
-			changeZoomDates(enlargementLoginChart); 
-		} else if (option == "readWriteEnlargement") {
-			changeZoomDates(enlargementReadWriteChart);
-		}
+		var chart = getChartByString(option); 
+		changeZoomDates(chart);
+		$("#enlargementChart").attr("data-id", option); 
 	}, 
 
 	onCategoryStatisticsMoreButtonClick = function(event) {
@@ -103,7 +126,10 @@ StatisticsModule.StatisticsView = (function() {
 		    var obj = $("#tagcloud").data("jqcloud");
 		    var data = obj.word_array;
 		    for (var i in data) {
-		        $("#" + data[i]["attr"]["id"]).css("color", data[i]["color"]);
+		    	var text = data[i]["text"];
+		    	var color = data[i]["color"];
+		        $("#" + data[i]["attr"]["id"]).css("color", color);
+		        addCategoryListItem(color, text);
 		    }
 		}, 100);
 		$("#categoryStatisticsModal").on('shown.bs.modal', {'words': words}, onCategoryStatisticsModalShow); 
@@ -154,15 +180,17 @@ StatisticsModule.StatisticsView = (function() {
 	    });
 	}, 
 
-	initDatePicker = function() {
+	initDatePicker = function(min, max) {
 		$('.date-picker').datepicker( {
 			showOn: "button",
       		buttonImage: "res/images/calendar.png",
       		buttonImageOnly: true,
 	        changeMonth: true,
 	        changeYear: true,
-	        minDate: new Date('2008/01'),
-        	maxDate: new Date('2016/08'),
+	        minDate: new Date(min*1000),
+        	maxDate: new Date(max*1000),
+	        /*minDate: new Date('2008/01'),
+        	maxDate: new Date('2016/08'),*/
 	        showButtonPanel: true,
 	        monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
 	        //dateFormat: 'MM yy',
@@ -173,6 +201,7 @@ StatisticsModule.StatisticsView = (function() {
             		$(this).data('oldValue',dateText);
 					changeZoomDates(loginStatisticsChart);
 					changeZoomDates(accessStatisticsChart); 
+					changeZoomDates(courseStatisticsChart); 
 					var startDate = $("#startDate").datepicker('getDate');
 		    		var endDate = $("#endDate").datepicker('getDate');
 					timeperiodSlider.dateRangeSlider("values", startDate, endDate);
@@ -185,16 +214,20 @@ StatisticsModule.StatisticsView = (function() {
     	$("#endDate").datepicker("refresh");
 	}, 
 
-	initSlider = function() {
+	initSlider = function(min, max) {
 		timeperiodSlider = $("#slider-range");
 		timeperiodSlider.dateRangeSlider({
 			bounds: {
-		      min: new Date(2008, 0, 1),
-		      max: new Date(2016, 7, 1)  
+		      /*min: new Date(2008, 0, 1),
+		      max: new Date(2016, 7, 1)  */
+		      min: new Date(min*1000),
+		      max: new Date(max*1000) 
 		    },
 		    defaultValues:{
-			    min: new Date(2008, 0, 1),
-		      	max: new Date(2016, 7, 1)  
+		    	min: new Date(min*1000),
+		      	max: new Date(max*1000) 
+			    /*min: new Date(2008, 0, 1),
+		      	max: new Date(2016, 7, 1)*/  
   			},
 		    step:{
 			    months: 1
@@ -210,6 +243,8 @@ StatisticsModule.StatisticsView = (function() {
 		timeperiodSlider.bind("valuesChanged", function(e, data){
 			var start = data.values.min;
 			var end = data.values.max;
+			var unixStart = start.getTime()/1000; 
+			var unixEnd = end.getTime()/1000; 
 			var startMonth = start.getMonth() + 1; 
 			var startYear = start.getFullYear(); 
 			var endMonth = end.getMonth() + 1;
@@ -219,8 +254,14 @@ StatisticsModule.StatisticsView = (function() {
     		$("#startDate").datepicker("refresh");
     		$("#endDate").datepicker("setDate", new Date(endYear + "/" + endMonth));
     		$("#endDate").datepicker("refresh");
-    		changeZoomDates(loginStatisticsChart);
-			changeZoomDates(accessStatisticsChart); 
+    		console.log(started); 
+    		if(started != 0) {
+    			changeZoomDates(loginStatisticsChart);
+				changeZoomDates(accessStatisticsChart); 
+				changeZoomDates(courseStatisticsChart); 
+				$(that).trigger("timeperiodValuesChanged", [unixStart, unixEnd]);
+    		}
+    		started = 1;
 		});
 	}, 
 
@@ -314,6 +355,28 @@ StatisticsModule.StatisticsView = (function() {
 			subscriberCount: subscriberCount, 
 			trainerCount: trainerCount
 		});
+		categoryStatisticsTableItemCount++;
+	},
+
+	makeCategoryListItem = function(options) {
+		var item = StatisticsModule.CategoryListItem().init({
+			id: options.id,
+			backgroundColor: options.backgroundColor,
+			title: options.title, 
+			collapseId: options.collapseId
+		}); 
+		var $el = item.render(); 
+		$("#categoryList").append($el); 
+	}, 
+
+	addCategoryListItem = function(backgroundColor, title) {
+		makeCategoryListItem({
+			id: "categoryListItem" + categoryListItemCount, 
+			backgroundColor: backgroundColor,
+			title: title, 
+			collapseId: "categoryListItem" + categoryListItemCount
+		});
+		categoryListItemCount++;
 	},
 
 	initChart = function(object, option) {
@@ -322,7 +385,9 @@ StatisticsModule.StatisticsView = (function() {
 			chartContainer = "loginStatisticsChart";
 		} if (option == "readWrite") {
 			chartContainer = "accessStatisticsChart";
-		} if (option == "loginEnlargement" || option == "readWriteEnlargement") {
+		} if (option == "course") {
+			chartContainer = "courseStatisticsChart";
+		} if (option == "loginEnlargement" || option == "readWriteEnlargement" || option == "courseEnlargement") {
 			chartContainer = "enlargementChart";
 		} 
 		var chartData = generateChartData(object, option);
@@ -377,15 +442,18 @@ StatisticsModule.StatisticsView = (function() {
 		        console.log("zoom");
 		});
 
-
 		if (option == "login") {
 			loginStatisticsChart = chart;
 		} if (option == "readWrite") {
 			accessStatisticsChart = chart; 
+		} if (option == "course") {
+			courseStatisticsChart = chart;
 		} if (option == "loginEnlargement") {
 			enlargementLoginChart = chart;
 		} if (option == "readWriteEnlargement") {
 			enlargementReadWriteChart = chart;
+		} if (option == "courseEnlargement") {
+			enlargementCourseChart = chart;
 		}
 	},
 
@@ -447,6 +515,18 @@ StatisticsModule.StatisticsView = (function() {
 				        visits: (parseInt(visitsDozent) + parseInt(visitsStudent))
 				    });
 			    }
+		    } else if (option == "course" || option == "courseEnlargement") {
+		    	count = 0; 
+		    	for (key in object) {
+		    		var visits = object[key]["anzahl"];
+		    		var activities = object[key]["aktivitaeten"]; 
+		    		addCourseStatisticsTableItem(object[key]["date_formatted"], visits, activities);
+		    		var newDate = new Date(parseInt(object[key]["timeend"])*1000);
+			    	chartData.push({
+				        date: newDate,
+				        visits: visits
+				    });
+			    }
 		    }
 			return chartData;
 		}, 
@@ -454,7 +534,6 @@ StatisticsModule.StatisticsView = (function() {
 		changeZoomDates = function(chart) {
 		    var startDate = $("#startDate").datepicker('getDate');
 		    var endDate = $("#endDate").datepicker('getDate');
-		    console.log(startDate, endDate); 
 		    chart.zoomToDates(startDate, endDate);
 		}, 
 
@@ -462,10 +541,21 @@ StatisticsModule.StatisticsView = (function() {
 		    var dArr = str.split("/");
 		    var date = new Date(Number(dArr[2]), Number(dArr[1]) - 1, dArr[0]);
 		    return date;
+		}, 
+
+		changeCountValues = function(object) {
+			var loginCount = object["loginCount"]; 
+			var readWriteCount = object["readWriteCount"];
+			var courseCount = object["courseCount"];
+			$("#loginCount").text(loginCount); 
+			$("#readWriteCount").text(readWriteCount);
+			$("#courseCount").text(courseCount); 
 		}; 
 
 	that.drawChart = drawChart; 
 	that.addTagCloud = addTagCloud; 
+	that.changeCountValues = changeCountValues; 
+	that.initTimePeriod = initTimePeriod; 
 	that.init = init; 
 	return that; 
 })();

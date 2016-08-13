@@ -8,9 +8,11 @@ StatisticsModule.MainModel = (function() {
 		$("#loadingOverlay").height($("body").height());
 		initSpinner(); 
 		startSpinner();
+		getMinAndMaxDate(); 
 		getLoginStatistics();
 		getReadWriteData();  
-		getCourseData();
+		getCourseData(); 
+		getCategoryData();
 		return that; 
 	}, 
 
@@ -58,8 +60,17 @@ StatisticsModule.MainModel = (function() {
 		spinner.spin(spinnerOverlay);
 	}, 
 
-	getCourseData = function() {
-		$.get("src/php/functions.php?command=getCourseData").done(
+	getMinAndMaxDate = function() {
+		$.get("src/php/functions.php?command=getMinAndMaxDate").done(
+		function(data) {
+			var json = data; 
+			var object = jQuery.parseJSON(json); 
+			console.log(object); 
+			$(that).trigger('initTimePeriod', object);
+		});
+	}
+	getCategoryData = function() {
+		$.get("src/php/functions.php?command=getCategoryData").done(
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
@@ -83,11 +94,34 @@ StatisticsModule.MainModel = (function() {
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
+			console.log(object); 
 			$(that).trigger('drawChart', [object, "readWrite"]);
 		}); 
+	}, 
+
+	getCourseData = function() {
+		$.get("src/php/functions.php?command=getCourseData").done(
+		function(data) {
+			var json = data; 
+			var object = jQuery.parseJSON(json); 
+			console.log(object); 
+			$(that).trigger('drawChart', [object, "course"]);
+		});
+	}, 
+
+	getCounts = function(start, end) {
+		console.log(start, end); 
+		$.ajax({url: "src/php/functions.php?command=getCounts", data: {start: start, end: end}}).done(
+		function(data) {
+			var json = data; 
+			var object = jQuery.parseJSON(json); 
+			console.log(object); 
+			$(that).trigger('changeCountValues', [object]);
+		});
 	}; 
 
 
 	that.init = init; 
+	that.getCounts = getCounts; 
 	return that; 
 })(); 
