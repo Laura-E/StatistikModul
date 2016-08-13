@@ -96,6 +96,7 @@ StatisticsModule.StatisticsView = (function() {
 	onCourseStatisticsModalPrintClick = function(event){
 		
 		printElement("courseStatisticsModal");		
+
 	},
 
 	onCategoryStatisticsModalPrintClick = function(event){
@@ -107,17 +108,44 @@ StatisticsModule.StatisticsView = (function() {
 	onAccessStatisticsModalPrintClick = function(event){
 		
 		printElement("accessStatisticsModal");		
+
 	},
 
 	onLoginStatisticsModalPrintClick = function(event){
 		
 		printElement("loginStatisticsModal");		
+
 	},
 
 	onChartEnlargementModalPrintClick = function(event){		
 		
 		printElement("chartEnlargementModal");	
+
 	}, 
+
+	printElement = function(el){
+
+		var content = document.getElementById(el);
+		var pri = document.getElementById("ifmcontentstoprint").contentWindow;
+		pri.document.open();
+		pri.document.write('<html><head>');
+        pri.document.write('<link rel="stylesheet" href="res/css/print.css" type="text/css" />');
+        pri.document.write('</head><body>');
+		pri.document.write(content.innerHTML);
+		pri.document.write('</body></html>');
+		
+
+		var piechart = pri.document.getElementById("coursePie");
+		if(piechart != null){
+			piechart.parentNode.removeChild(piechart);
+		}
+		
+		pri.document.close(); // necessary for IE >= 10
+        pri.focus(); 
+		pri.print();
+		pri.close();
+		window.focus();
+	},
 
 	printElement = function(el){
 
