@@ -165,7 +165,7 @@ StatisticsModule.StatisticsView = (function() {
 		$("#categoryStatsTab").on("click", {"words": words}, onCategoryStatsTabClick);
 		//initCloud(words); 
 	}, 
-	
+
 	onCategoryStatsTabClick = function(event) {
 		initCloud(event.data.words);
 	}, 
@@ -318,8 +318,8 @@ StatisticsModule.StatisticsView = (function() {
     			changeZoomDates(loginStatisticsChart);
 				changeZoomDates(accessStatisticsChart); 
 				changeZoomDates(courseStatisticsChart); 
-				$(that).trigger("timeperiodValuesChanged", [unixStart, unixEnd]);
     		}
+    		$(that).trigger("timeperiodValuesChanged", [unixStart, unixEnd]);
     		started = 1;
 		});
 	}, 
