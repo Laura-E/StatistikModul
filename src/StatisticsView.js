@@ -21,8 +21,16 @@ StatisticsModule.StatisticsView = (function() {
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
 		$("#categoryStatisticsMoreButton").on('click', onCategoryStatisticsMoreButtonClick); 
+
+		$("#courseStatisticsModalPrint").on('click', onCourseStatisticsModalPrintClick);
+		$("#categoryStatisticsModalPrint").on('click', onCategoryStatisticsModalPrintClick);
+		$("#accessStatisticsModalPrint").on('click', onAccessStatisticsModalPrintClick);
+		$("#loginStatisticsModalPrint").on('click', onLoginStatisticsModalPrintClick);
+		$("#chartEnlargementModalPrint").on('click', onChartEnlargementModalPrintClick);
+
 		$("#lineChartButton").on('click', onLineChartButtonClick); 
 		$("#barChartButton").on('click', onBarChartButtonClick); 
+
 		return that; 
 	}, 
 	initTimePeriod = function(object) {
@@ -83,7 +91,56 @@ StatisticsModule.StatisticsView = (function() {
 
 	onLoginStatisticsMoreButtonClick = function(event) {
 		$("#loginStatisticsModal").modal('show'); 
-	}, 
+	},
+
+	onCourseStatisticsModalPrintClick = function(event){
+		
+		printElement("courseStatisticsModal");		
+	} 
+
+	onCategoryStatisticsModalPrintClick = function(event){
+		
+		printElement("categoryStatisticsModal");
+			
+	}
+
+	onAccessStatisticsModalPrintClick = function(event){
+		
+		printElement("accessStatisticsModal");		
+	}
+
+	onLoginStatisticsModalPrintClick = function(event){
+		
+		printElement("loginStatisticsModal");		
+	}
+
+	onChartEnlargementModalPrintClick = function(event){		
+		
+		printElement("chartEnlargementModal");	
+	}
+	printElement = function(el){
+
+		var content = document.getElementById(el);
+		var pri = document.getElementById("ifmcontentstoprint").contentWindow;
+		pri.document.open();
+		pri.document.write('<html><head>');
+        pri.document.write('<link rel="stylesheet" href="res/css/print.css" type="text/css" />');
+        pri.document.write('</head><body>');
+		pri.document.write(content.innerHTML);
+		pri.document.write('</body></html>');
+		
+
+		var piechart = pri.document.getElementById("coursePie");
+		if(piechart != null){
+			piechart.parentNode.removeChild(piechart);
+		}
+		
+		pri.document.close(); // necessary for IE >= 10
+        pri.focus(); 
+		pri.print();
+		pri.close();
+		window.focus();
+	}
 
 	addTagCloud = function(object) {
 		var words = [];

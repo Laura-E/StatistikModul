@@ -10,17 +10,21 @@
             <link rel="stylesheet" href="libs/bootstrap-3.3.4/css/bootstrap.min.css">
             <link rel="stylesheet" href="libs/jquery-ui-1.11.4.custom/jquery-ui.css">
             <link rel="stylesheet" href="libs/jQRangeSlider-master/css/iThing.css" type="text/css" />
-		    <link rel="stylesheet" href="res/css/style.css">
+		    <link rel="stylesheet" href="res/css/style.css" id="stylesheet">
+            <link rel="stylesheet" type="text/css" href="res/css/print.css" media="print">  
 
 	</head>
 
 	<body>
 
+    <iframe id="ifmcontentstoprint" class="printable" style="height: 0px; width: 0px; position: absolute"></iframe>
+    
     <div class="modal fade" id="chartEnlargementModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input class="print" id="chartEnlargementModalPrint" value="Drucken" />
                     <h4 class="modal-title" id="loginStatisticsTableTitle">Chart</h4>
                 </div>
                 <div class="modal-body">
@@ -32,11 +36,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="loginStatisticsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="loginStatisticsModal" class="printable" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input  class="print" id="loginStatisticsModalPrint" value="Drucken" />
                     <h4 class="modal-title" id="loginStatisticsTableTitle">Login-Statistik</h4>
                 </div>
                 <div class="modal-body">
@@ -58,11 +63,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="courseStatisticsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="courseStatisticsModal" class="printable" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input class="print" id="courseStatisticsModalPrint" value="Drucken" />
                     <h4 class="modal-title" id="courseStatisticsTableTitle">Kurs-Statistik</h4>
                 </div>
                 <div class="modal-body">
@@ -83,11 +89,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="accessStatisticsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="accessStatisticsModal" class="printable" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input class="print" id="accessStatisticsModalPrint" value="Drucken" />
                     <h4 class="modal-title" id="accessStatisticsTableTitle">Zugriffs-Statistik</h4>
                 </div>
                 <div class="modal-body">
@@ -110,11 +117,12 @@
         </div>
     </div>
 
-    <div class="modal fade" id="categoryStatisticsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal fade" id="categoryStatisticsModal" class="printable" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <input class="print" id="categoryStatisticsModalPrint" value="Drucken" />
                     <h4 class="modal-title" id="courseStatisticsTableTitle">Kursbereichs-Statistik</h4>
                 </div>
                 <div class="modal-body">
@@ -166,7 +174,7 @@
   
 
      ?>
-        <div class="container">
+        <div class="container printable">
             
 
             <ul class="nav nav-tabs nav-justified" id="StatisticsTabs">
