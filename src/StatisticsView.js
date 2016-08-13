@@ -96,28 +96,29 @@ StatisticsModule.StatisticsView = (function() {
 	onCourseStatisticsModalPrintClick = function(event){
 		
 		printElement("courseStatisticsModal");		
-	} 
+	},
 
 	onCategoryStatisticsModalPrintClick = function(event){
 		
 		printElement("categoryStatisticsModal");
 			
-	}
+	},
 
 	onAccessStatisticsModalPrintClick = function(event){
 		
 		printElement("accessStatisticsModal");		
-	}
+	},
 
 	onLoginStatisticsModalPrintClick = function(event){
 		
 		printElement("loginStatisticsModal");		
-	}
+	},
 
 	onChartEnlargementModalPrintClick = function(event){		
 		
 		printElement("chartEnlargementModal");	
-	}
+	}, 
+
 	printElement = function(el){
 
 		var content = document.getElementById(el);
@@ -140,7 +141,7 @@ StatisticsModule.StatisticsView = (function() {
 		pri.print();
 		pri.close();
 		window.focus();
-	}
+	},
 
 	addTagCloud = function(object) {
 		var words = [];
@@ -164,6 +165,7 @@ StatisticsModule.StatisticsView = (function() {
 		$("#categoryStatsTab").on("click", {"words": words}, onCategoryStatsTabClick);
 		//initCloud(words); 
 	}, 
+	
 	onCategoryStatsTabClick = function(event) {
 		initCloud(event.data.words);
 	}, 
