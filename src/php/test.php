@@ -1,7 +1,137 @@
 <?php 
 
     require_once('../../../config.php');
-    getCounts("1277935200", "1343772000"); 
+    //getCounts("1277935200", "1343772000"); 
+    //getCategoryData(); 
+    getCategories();
+    
+    function addToValue($key, $courseids, $value) {
+        $courseidstr = array_key_exists($key, $courseids) ? ("(".implode(",", $courseids[$key]).")") : "";
+
+        if($courseidstr != "") {
+            $value->trainer = getTrainerCount($courseidstr);
+            $value->subscriber = getSubscriberCount($courseidstr);
+            $value->materials = getMaterialsCount($courseidstr);
+        }
+        return $value;
+    } 
+
+    function getCategories() {
+        global $DB;
+        $topcategory = 0; 
+        //$courseids = getCourseIds($courses, $topcategory, $parents); 
+        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+        $faculties = $DB->get_records_sql($sql);
+        //$faculties = addAllToValue($faculties); 
+        //$value = addToValue($key, $courseids, $value); 
+        foreach ($faculties as $key=>$value) {
+            $topcategory = $key;
+            $sql1 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+            $institutes = $DB->get_records_sql($sql1);
+            $institutes = addAllToValue($institutes); 
+            //$institutes = addToValue($key, $courseids, $value); 
+            foreach ($institutes as $key1=>$value) {
+                $topcategory = $key1;
+                $sql2 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+                $coursesOfStudies = array(); 
+                $coursesOfStudies = $DB->get_records_sql($sql2);
+                //$coursesOfStudies = addAllToValue($coursesOfStudies); 
+                //$value = addToValue($key, $courseids, $value); 
+                $institutes[$key1]->subcategory = $coursesOfStudies; 
+            }
+            $faculties[$key]->subcategory = $institutes;
+        }
+        echo json_encode($faculties); 
+    }
+
+    function addAllToValue($categories) {
+        //echo json_encode($categories);
+        $array = array(); 
+        foreach ($categories as $key=>$value) {
+
+            //$courseidstr = array_key_exists($key, $courseids) ? ("(".implode(",", $courseids[$key]).")") : "";
+
+            //if($courseidstr != "") {
+                $categories[$key]->trainer = "trainer";
+                //$value->subscriber = getSubscriberCount($courseidstr);
+                //$value->materials = getMaterialsCount($courseidstr);
+                $categories[$key]->subscriber = "subscriber";
+                $categories[$key]->materials = "materials";
+            //}
+
+
+            //$value = addToValue($key, $courseids, $value); 
+            //$array[$key] = $value;
+        }
+        //echo json_encode($categories);
+        return $categories;
+    }
+
+    /*function getCategories() {
+        global $DB;
+        $topcategory = 0; 
+        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+        $faculties = $DB->get_records_sql($sql);
+        foreach ($faculties as $key=>$value) {
+            $topcategory = $key;
+            $sql1 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+            $institutes = $DB->get_records_sql($sql1);
+
+            foreach ($institutes as $key1=>$value) {
+                $topcategory = $key;
+                $sql2 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+                $coursesOfStudies = $DB->get_records_sql($sql2);
+                $institutes[$key1]->subcategory = $coursesOfStudies; 
+            }
+            $faculties[$key]->subcategory = $institutes;
+        }
+        echo json_encode($faculties); 
+    }*/
+
+    /*function getCategories($courses, $parents) {
+        global $DB;
+        $topcategory = 0; 
+        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+        $faculties = $DB->get_records_sql($sql);
+        $allCategories;
+        $count = 0; 
+        foreach ($faculties as $key=>$value) {
+            $topcategory = $key;
+            $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+            $institutes = $DB->get_records_sql($sql);
+
+            $courseids = getCourseIds($courses, $topcategory, $parents); 
+
+
+            $value = addToValue($key, $courseids, $value); 
+            $allCategories[] = $value;
+            $instituteArray = array();
+            $subCount = 0; 
+            foreach ($institutes as $key=>$value) {
+                $topcategory = $key;
+                $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+                $coursesOfStudies = $DB->get_records_sql($sql);
+
+                $value = addToValue($key, $courseids, $value); 
+
+
+                $instituteArray[] = $value;
+                $coursesOfStudiesArray = array();
+                foreach ($coursesOfStudies as $key=>$value) {
+                    $value = addToValue($key, $courseids, $value); 
+                    $coursesOfStudiesArray[] = $value;
+                }
+                $instituteArray[$subCount]->subcategory = $coursesOfStudiesArray; 
+                $coursesOfStudiesArray = array();
+                $subCount++;
+            }
+            $allCategories[$count]->subcategory = $instituteArray;
+            $instituteArray = array(); 
+            $count++;
+        }
+        return $allCategories;
+        //echo json_encode($allCategories); 
+    }*/
 
     function getCourseData() {
         global $DB;
@@ -42,7 +172,44 @@
         echo json_encode($counts);
     }
 
-    function getCourseData2() {  
+    function getCourseIds($courses, $topcategory, $parents) {
+        $courseids = array();
+        foreach ($courses as $data) {
+
+            $maincategory = false;
+            
+            if ($topcategory != 0) {
+                //echo "test: " . ($parents[$data->category][0]); 
+                if (isset($parents[$data->category][0]) &&
+                    $parents[$data->category][0] ==
+                        $topcategory) {
+                    // we look for the category under the root category. this
+                    // is either course category itself or a different parent
+                    // (if there's a parent category between course category
+                    // and root category).
+                    $categoryparents = array_merge(
+                        $parents[$data->category], array($data->category));
+                    $maincategory = $categoryparents[1];
+                    //echo json_encode($categoryparents); 
+                }
+            } else if (isset($parents[$data->category][0])) {
+                //oberste Kategorie
+                //echo json_encode($parents[$data->category]); 
+                $maincategory = $parents[$data->category][0];
+            }
+
+            if ($maincategory) {
+                if (!isset($courseids[$maincategory])) {
+                    $courseids [$maincategory] = array();
+                }
+                $courseids[$maincategory][] = $data->courseid;
+                //echo $data->courseid . " "; 
+            }
+        }
+        return $courseids;
+    }
+
+    function getCategoryData() {  
     global $DB; 
         $startwhere = "";
         $endwhere = "";
@@ -112,19 +279,20 @@
         //echo json_encode($courses);
 
         $result = array();
-        $courseids = array();
+        //$courseids = array();
 
         $list = array();
         $parents = array();
 
-        //GRIPS26-261 moodle 3.1 - block stats - Kategoriestatistik geht nicht
         make_categories_list_ls($list, $parents);
-
-        foreach ($courses as $data) {
+        //echo json_encode($list); 
+        $courseids = getCourseIds($courses, $topcategory, $parents); 
+        /*foreach ($courses as $data) {
 
             $maincategory = false;
             
             if ($topcategory != 0) {
+                //echo "test: " . ($parents[$data->category][0]); 
                 if (isset($parents[$data->category][0]) &&
                     $parents[$data->category][0] ==
                         $topcategory) {
@@ -135,9 +303,11 @@
                     $categoryparents = array_merge(
                         $parents[$data->category], array($data->category));
                     $maincategory = $categoryparents[1];
+                    //echo json_encode($categoryparents); 
                 }
             } else if (isset($parents[$data->category][0])) {
                 //oberste Kategorie
+                //echo json_encode($parents[$data->category]); 
                 $maincategory = $parents[$data->category][0];
             }
 
@@ -146,8 +316,12 @@
                     $courseids [$maincategory] = array();
                 }
                 $courseids[$maincategory][] = $data->courseid;
+                //echo $data->courseid . " "; 
             }
-        }
+        }*/
+        //echo json_encode($parents);
+        //echo json_encode($courseids);
+        //echo "<br />";
 
         $colors = array(
             'c_13' => "rgb(114,75,81)",// Zentrum für Sprache und Kommunikation (ZSK)
@@ -175,28 +349,29 @@
         
         $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
         $categories = $DB->get_records_sql($sql);
-        //echo json_encode($categories);
-        //Die Userzahlen für die Kategorien aufsummieren.
+
         $statsdata = array();
+        $allCategoriesArray = getCategories($courses, $parents);
         $courseidsstr = array();
         foreach ($courseids as $maincategory => $courseid) {
+            //echo json_encode($courseid);
             $courseidstr[$maincategory] = "(".implode(",", $courseid).")";
             $sql = "SELECT '$maincategory' as category, '".count($courseid)."' as courses, ".
                     "sum(teilnahmen) as teilnahmen, sum(kursleitungen) as kursleitungen ".
                     "FROM mdl_tmp_stats_coursecounts ".
                     "WHERE courseid in {$courseidstr[$maincategory]} ";
             if(array_key_exists("c_".$maincategory, $colors)) {
-                //$courseData = $DB->get_records_sql($sql);
-                //echo $DB->get_records_sql($sql)["".$maincategory]->kurse;
+                //echo $courseidstr[$maincategory];
                 $statsdata[$maincategory]["courses"] = $DB->get_records_sql($sql)["".$maincategory]->courses;
                 $statsdata[$maincategory]["color"] = $colors["c_".$maincategory];
                 $statsdata[$maincategory]["name"] = $categories["".$maincategory]->name;
+                $statsdata[$maincategory]["id"] = $categories["".$maincategory]->id;
                 $statsdata[$maincategory]["trainer"] = getTrainerCount($courseidstr[$maincategory]);
                 $statsdata[$maincategory]["subscriber"] = getSubscriberCount($courseidstr[$maincategory]);
                 $statsdata[$maincategory]["materials"] = getMaterialsCount($courseidstr[$maincategory]);
             }
         }
-
+        $statsdata["all"] = $allCategoriesArray;
         echo json_encode($statsdata);
     
     }
@@ -210,11 +385,11 @@
                 "WHERE (ra.roleid not in (1, 2, 3, 4, 8, 10 ,11,12,14,16)) ".
                 "AND ctx.instanceid in $courseids";
         $count = $DB->get_record_sql($sql);
-
         return $count->count;
     }
 
     function getTrainerCount($courseids) {
+        echo json_encode($courseids); 
         global $DB;
         $sql = "SELECT count(DISTINCT userid) as count ".
                 "FROM mdl_role_assignments ra ".

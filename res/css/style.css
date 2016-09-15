@@ -29,6 +29,10 @@ body {
 	margin: 0px !important;
 }
 
+.bootstrap-select {
+	width: 500px !important;
+}
+
 .box {
 	border-radius: 2px; 
 	border: 1px solid #ccc;
@@ -76,6 +80,36 @@ body {
 #optionsBox {
 	width: 470px;
 	margin: 20px auto;
+}
+
+#categoryStatisticsOptionsBox {
+	margin: 20px;
+}
+
+.selectSeparator {
+	background-color: #ccc;
+	height: 2px;
+	display: none;
+}
+
+#categoryStatisticsSelectItemContainer div {
+	padding: 10px 10px 0px 10px;
+}
+
+select {
+  	width:100% !important;
+  	-webkit-appearance: none;
+  	-moz-appearance: none;
+  	appearance: none;
+  	border: 1px solid #bbb;
+  	border-radius: 2px;
+  	padding:.75em 1em .5em 1em;
+  	margin: 4px 0px!important;
+  	background-color:white;
+  	background-image:url(../images/select-arrow.jpg);
+  	background-size: 20px;
+  	background-position: 99%;
+  	background-repeat: no-repeat;
 }
 
 .title {
@@ -189,6 +223,11 @@ div.jqcloud {
     width: 70px;
 }
 
+.list-group-item {
+	border-radius: 0px !important;
+	padding-left: 30px !important;
+}
+
 #coursePie {
 	height: 500px;
 }
@@ -201,7 +240,7 @@ div.jqcloud {
 	width: 800px !important;
 }
 
-.zmdi-zoom-in {
+.zmdi-zoom-in, #categoryStatisticsOptionsAddButton {
 	float: right;
 	padding-left: 10px;
 	cursor: pointer;
@@ -227,7 +266,7 @@ div.jqcloud {
 	padding-top: 50px;
 }
 
-#loginStatisticsChart, #accessStatisticsChart, #courseStatisticsChart {
+#loginStatisticsChart, #accessStatisticsChart, #courseStatisticsChart, #categoryStatisticsChart {
 	width	: 100%;
 	height	: 300px;
 }	
@@ -243,14 +282,22 @@ div.jqcloud {
 
 .panel-group .panel {
 	position: relative;
+	cursor: pointer;
+}
+
+.courseOfStudiesCollapse ul {
+	margin: 0px;
+}
+.panel a {
+	text-decoration: none !important;
 }
 
 .categoryTitle {
-	padding-left: 20px;
+	padding-left: 30px;
 	margin: 0px;
 }
 
-#categoryList {
+#accordion {
 	width: 50%;
 }
 

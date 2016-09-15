@@ -1,12 +1,14 @@
 StatisticsModule.MainController = (function() {
 	var that = {},
 	statisticsView = null; 
+	categoryStatisticsView = null;
 
 	init = function() {
 		mainModel = StatisticsModule.MainModel; 
 		mainModel.init(); 
 
 		statisticsView = StatisticsModule.StatisticsView.init(); 
+		categoryStatisticsView = StatisticsModule.CategoryStatisticsView.init(); 
 
 		$(mainModel).on('initTimePeriod', onInitTimePeriod); 
 		$(mainModel).on('drawChart', onDrawChart); 
@@ -28,7 +30,7 @@ StatisticsModule.MainController = (function() {
 	}, 
 
 	onAddTagCloud = function(event, object) {
-		statisticsView.addTagCloud(object); 
+		categoryStatisticsView.addTagCloud(object); 
 	}, 
 
 	onDrawChart = function(event, object, option) {

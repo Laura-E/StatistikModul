@@ -10,13 +10,17 @@ StatisticsModule.StatisticsView = (function() {
 	accessStatisticsTableItemCount = 0, 
 	loginStatisticsTableItemCount = 0, 
 	courseStatisticsTableItemCount = 0, 
-	categoryStatisticsTableItemCount = 0, 
-	categoryListItemCount = 0, 
+	/*categoryStatisticsTableItemCount = 0, 
+	categoryStatisticsCompareTableItemCount = 0, 
+	categoryStatisticsSelectItemCount = 0, */
+
 	started = 0, 
 
 	init = function() {
-     	/*initSlider(); 
-     	initDatePicker(); */
+		/*$("#facultySelect").selectpicker();
+		$("#instituteSelect").selectpicker(); 
+		$("#courseOfStudiesSelect").selectpicker(); */
+
 		$("#loginStatisticsMoreButton").on('click', onLoginStatisticsMoreButtonClick); 
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
@@ -30,9 +34,11 @@ StatisticsModule.StatisticsView = (function() {
 
 		$("#lineChartButton").on('click', onLineChartButtonClick); 
 		$("#barChartButton").on('click', onBarChartButtonClick); 
-
+		
+		//initCategoryStatisticsChart(); 
 		return that; 
 	}, 
+
 	initTimePeriod = function(object) {
 		var min = parseInt(object["min"]);
 		var max = parseInt(object["max"]);
@@ -171,7 +177,7 @@ StatisticsModule.StatisticsView = (function() {
 		window.focus();
 	},
 
-	addTagCloud = function(object) {
+	/*addTagCloud = function(object) {
 		var words = [];
 		for (var key in object) {
 			var faculty = object[key];
@@ -216,7 +222,10 @@ StatisticsModule.StatisticsView = (function() {
 		    	var text = data[i]["text"];
 		    	var color = data[i]["color"];
 		        $("#" + data[i]["attr"]["id"]).css("color", color);
-		        addCategoryListItem(color, text);
+		        $("#facultySelect").append("<option>" + text + "</option>");
+		        $("#facultySelect").val("-").selectpicker('refresh');
+		        //addCategoryListItem(color, text);
+		        //addCourseOfStudiesListItem("test", text);
 		    }
 		}, 100);
 		$("#categoryStatisticsModal").on('shown.bs.modal', {'words': words}, onCategoryStatisticsModalShow); 
@@ -265,7 +274,7 @@ StatisticsModule.StatisticsView = (function() {
 			},
 	        seriesColors: chart_series_colors
 	    });
-	}, 
+	}, */
 
 	initDatePicker = function(min, max) {
 		$('.date-picker').datepicker( {
@@ -420,7 +429,7 @@ StatisticsModule.StatisticsView = (function() {
 	}, 
 
 
-	makeCategoryStatisticsTableItem = function(options) {
+	/*makeCategoryStatisticsTableItem = function(options) {
 		var item = StatisticsModule.CategoryStatisticsTableItem().init({
 			id: options.id,
 			category: options.category,
@@ -445,26 +454,134 @@ StatisticsModule.StatisticsView = (function() {
 		categoryStatisticsTableItemCount++;
 	},
 
-	makeCategoryListItem = function(options) {
-		var item = StatisticsModule.CategoryListItem().init({
-			id: options.id,
-			backgroundColor: options.backgroundColor,
+	makeCategoryStatisticsCompareTableItem = function(options) {
+		var item = StatisticsModule.CategoryStatisticsCompareTableItem().init({
+			id: options.id, 
 			title: options.title, 
-			collapseId: options.collapseId
+			trainerCount: options.trainerCount, 
+			subscriberCount: options.subscriberCount
 		}); 
 		var $el = item.render(); 
-		$("#categoryList").append($el); 
+		$("#categoryStatisticsSelectCompareTableItemContainer").append($el); 
 	}, 
 
-	addCategoryListItem = function(backgroundColor, title) {
-		makeCategoryListItem({
-			id: "categoryListItem" + categoryListItemCount, 
-			backgroundColor: backgroundColor,
+	addCategoryStatisticsCompareTableItem = function(title, trainerCount, subscriberCount) {
+		makeCategoryStatisticsCompareTableItem({
+			id: "categoryStatisticsCompareTableItem" + categoryStatisticsCompareTableItemCount, 
 			title: title, 
-			collapseId: "categoryListItem" + categoryListItemCount
+			trainerCount: trainerCount, 
+			subscriberCount: subscriberCount
 		});
-		categoryListItemCount++;
+		categoryStatisticsCompareTableItemCount++;
 	},
+
+	makeCategoryStatisticsSelectItem = function(options) {
+		var item = StatisticsModule.CategoryStatisticsSelectItem().init({
+			id: options.id
+		}); 
+		var $el = item.render(); 
+		$("#categoryStatisticsSelectItemContainer").append($el); 
+	}, 
+
+	addCategoryStatisticsSelectItem = function() {
+		makeCategoryStatisticsSelectItem({
+			id: "categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount
+		});
+		categoryStatisticsSelectItemCount++;
+	},*/
+
+	
+
+	initCategoryStatisticsChart = function() {
+			var chartData = generateChartData();
+
+var chart = AmCharts.makeChart("categoryStatisticsChart", {
+    "type": "serial",
+    "theme": "light",    "legend": {
+        "useGraphSettings": true
+    },
+    "dataProvider": chartData,
+    "synchronizeGrid":true,
+    "graphs": [{
+        "valueAxis": "v1",
+        "lineColor": "#FF6600",
+        "bullet": "round",
+        "bulletBorderThickness": 1,
+        "hideBulletsCount": 30,
+        "title": "Kurse",
+        "valueField": "visits",
+		"fillAlphas": 0
+    }, {
+        "valueAxis": "v2",
+        "lineColor": "#FCD202",
+        "bullet": "square",
+        "bulletBorderThickness": 1,
+        "hideBulletsCount": 30,
+        "title": "Materialien",
+        "valueField": "hits",
+		"fillAlphas": 0
+    }, {
+        "valueAxis": "v3",
+        "lineColor": "#B0DE09",
+        "bullet": "triangleUp",
+        "bulletBorderThickness": 1,
+        "hideBulletsCount": 30,
+        "title": "Teilnehmer",
+        "valueField": "views",
+		"fillAlphas": 0
+    }],
+    "chartScrollbar": {},
+    "chartCursor": {
+        "cursorPosition": "mouse"
+    },
+    "categoryField": "date",
+    "categoryAxis": {
+        "parseDates": true,
+        "axisColor": "#DADADA",
+        "minorGridEnabled": true
+    },
+    "export": {
+    	"enabled": true,
+        "position": "bottom-right"
+     }
+});
+
+chart.addListener("dataUpdated", zoomChart);
+zoomChart();
+
+
+// generate some random data, quite different range
+function generateChartData() {
+    var chartData = [];
+    var firstDate = new Date();
+    firstDate.setDate(firstDate.getDate() - 100);
+
+    for (var i = 0; i < 100; i++) {
+        // we create date objects here. In your data, you can have date strings
+        // and then set format of your dates using chart.dataDateFormat property,
+        // however when possible, use date objects, as this will speed up chart rendering.
+        var newDate = new Date(firstDate);
+        newDate.setDate(newDate.getDate() + i);
+
+        var visits = Math.round(Math.sin(i * 5) * i);
+        var hits = Math.round(Math.random() * 80) + 500 + i * 3;
+        var views = Math.round(Math.random() * 6000) + i * 4;
+
+        chartData.push({
+            date: newDate,
+            visits: visits,
+            hits: hits,
+            views: views
+        });
+    }
+    console.log(chartData); 
+    return chartData;
+}
+
+function zoomChart(){
+    chart.zoomToIndexes(chart.dataProvider.length - 20, chart.dataProvider.length - 1);
+}
+	}, 
 
 	initChart = function(object, option) {
 		var chartContainer;
@@ -640,7 +757,6 @@ StatisticsModule.StatisticsView = (function() {
 		}; 
 
 	that.drawChart = drawChart; 
-	that.addTagCloud = addTagCloud; 
 	that.changeCountValues = changeCountValues; 
 	that.initTimePeriod = initTimePeriod; 
 	that.init = init; 

@@ -6,7 +6,7 @@
 		<title>Grips - Statistikmodul</title>
             <link rel="stylesheet" href="libs/material-design-iconic-font/css/material-design-iconic-font.min.css">
             <link rel="stylesheet" href="libs/jquery.jqplot.1.0.9/jquery.jqplot.min.css">
-            <link rel="stylesheet" type="text/css" href="libs/jQCloud-master/jqcloud/jqcloud.css" />
+            <link rel="stylesheet" type="text/css" href="libs/jQCloud/dist/jqcloud.css" />
             <link rel="stylesheet" href="libs/bootstrap-3.3.4/css/bootstrap.min.css">
             <link rel="stylesheet" href="libs/jquery-ui-1.11.4.custom/jquery-ui.css">
             <link rel="stylesheet" href="libs/jQRangeSlider-master/css/iThing.css" type="text/css" />
@@ -227,9 +227,39 @@
                         <div class="title">Kursbereichs-Statistik<div class="more" id="categoryStatisticsMoreButton">mehr</div></div>
                         <div class="innerBox"><div id="tagcloud" style="width: 550px; height: 350px;"></div></div>
                     </div>
-                    <!--<ul class="list-group" id="categoryList">
-                    </ul>-->
-                    <div class="panel-group" id="categoryList"></div>
+
+
+                    <div class="box" id="categoryStatisticsOptionsBox">
+                        <div class="title">OPTIONEN<span id="categoryStatisticsOptionsAddButton" class="zmdi zmdi-plus zmdi-hc-lg"></span></div>
+
+                        <div id="categoryStatisticsSelectItemContainer">
+                            <!--<select class="selectpicker" id="facultySelect" data-live-search="true">
+                                <option>-</option>
+                            </select><br />
+                            <select class="selectpicker" id="instituteSelect">
+                                <option>-</option>
+                            </select><br />
+                            <select class="selectpicker" id="courseOfStudiesSelect">
+                                <option>-</p>
+                            </select><br />-->
+                        </div>
+                        <a id="a" href="#"></a>
+                    </div>
+
+                    <table class="table table-bordered" id="categoryStatisticsCompareTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Trainer</th>
+                                <th>Teilnehmer</th>
+                        </thead>
+                        <tbody id="categoryStatisticsCompareTableItemContainer">
+                            
+                        </tbody>
+                    </table>
+                    
+                    <!--<div class="panel-group" id="accordion"></div>-->
+                    <!--<div id="categoryStatisticsChart"></div>-->
                 </div>
             </div>
 
@@ -245,6 +275,21 @@
         
 
         ?>
+
+        <script type="text/html" id="categoryStatisticsSelectItem-tpl">
+            <div id="<%= id %>">
+                <select id="facultySelect">
+                    <option>-</option>
+                </select><br />
+                <select id="instituteSelect">
+                    <option>-</option>
+                </select><br />
+                <select id="courseOfStudiesSelect">
+                    <option>-</option>
+                </select>
+            </div>
+            <hr class="selectSeparator" />
+        </script>
 
         <script type="text/html" id="loginStatisticsTableItem-tpl">
             <tr id="<%= id %>">
@@ -283,29 +328,34 @@
             </tr>
         </script>
 
-        <script type="text/html" id="categoryListItem-tpl">
-            <div class="panel panel-default" id="<%= id %>">
-            <a href="#<%= collapseId %>" div class="panel-heading" data-toggle="collapse" data-parent="#categoryList">
-                <div class="panel-title">
-                    <div class="colorStripe" style="background-color:<%= backgroundColor %>;"></div>
-                    <p class="categoryTitle"><%= title %></p>
-                </div>
-            </a>
-            <div id="<%= collapseId %>" class="panel-collapse collapse courseOfStudiesCollapse">
-                <ul class="list-group fileList" id="collectionUl">
-                </ul>
-            </div>
-        </div>
+        <script type="text/html" id="categoryStatisticsCompareTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= title %></td>
+                <td><%= trainerCount %></td>
+                <td><%= subscriberCount %></td>
+            </tr>
         </script>
-<!--<li class="list-group-item categoryListItem" id="<%= id %>">
-                <div class="colorStripe" style="background-color:<%= backgroundColor %>;"></div>
-                <p class="categoryTitle"><%= title %></p>
-            </li>-->
+
+        <!--<script type="text/html" id="categoryListItem-tpl">
+            <div class="panel panel-default" id="<%= id %>">
+                <a href="#<%= collapseId %>" class="panel-heading" data-toggle="collapse" data-parent="#accordion">
+                    <div class="panel-title">
+                        <div class="colorStripe" style="background-color:<%= backgroundColor %>;"></div>
+                        <p class="categoryTitle"><%= title %></p>
+                    </div>
+                </a>
+                <div id="<%= collapseId %>" class="panel-collapse collapse courseOfStudiesCollapse">
+                    <ul class="list-group courseOfStudiesList" id="collectionUl">
+                    </ul>
+                </div>
+            </div>
+        </script>
+
         <script type="text/html" id="courseOfStudiesListItem-tpl">
             <li class="list-group-item" id="<%= id %>" tabindex="1">
                 <span class="courseOfStudiesTitle"><%= title %></span> 
             </li>
-        </script>
+        </script>-->
 
         <script type="text/javascript" src="libs/jquery-2.1.4.js"></script>
         <script type="text/javascript" src="libs/underscore.js"></script>
@@ -333,8 +383,8 @@
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pointLabels.js"></script>
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pieRenderer.js"></script>
-        <script type="text/javascript" src="http://mistic100.github.io/jQCloud/dist/jqcloud2/dist/jqcloud.js"></script>
-
+        <script type="text/javascript" src="libs/jQCloud/dist/jqcloud.js"></script>
+        <!--<script type="text/javascript" src="https://mistic100.github.io/jQCloud/dist/jqcloud2/dist/jqcloud.js"></script>-->
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/amcharts.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/serial.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/themes/light.js"></script>
@@ -343,11 +393,13 @@
         <script src="src/MainController.js"></script>
         <script src="src/MainModel.js"></script>
         <script src="src/StatisticsView.js"></script>
+        <script src="src/CategoryStatisticsView.js"></script>
         <script src="src/LoginStatisticsTableItem.js"></script>
         <script src="src/CourseStatisticsTableItem.js"></script>
         <script src="src/AccessStatisticsTableItem.js"></script>
         <script src="src/CategoryStatisticsTableItem.js"></script>
-        <script src="src/CategoryListItem.js"></script>
+        <script src="src/CategoryStatisticsSelectItem.js"></script>
+        <script src="src/CategoryStatisticsCompareTableItem.js"></script>
 
         <script>
             StatisticsModule.init();    
