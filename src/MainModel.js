@@ -4,10 +4,12 @@ StatisticsModule.MainModel = (function() {
 	spinner, 
 
 	init = function() {
+		$(this).scrollTop(0);
 		$("#loadingOverlay").width($("body").width());
 		$("#loadingOverlay").height($("body").height());
 		initSpinner(); 
 		startSpinner();
+		//getInactiveCoursesAndUsers(); 
 		getMinAndMaxDate(); 
 		getLoginStatistics();
 		getReadWriteData();  
@@ -68,7 +70,8 @@ StatisticsModule.MainModel = (function() {
 			console.log(object); 
 			$(that).trigger('initTimePeriod', object);
 		});
-	}
+	}, 
+
 	getCategoryData = function() {
 		$.get("src/php/functions.php?command=getCategoryData").done(
 		function(data) {
@@ -78,6 +81,30 @@ StatisticsModule.MainModel = (function() {
 			$(that).trigger('addTagCloud', object);
 			stopSpinner(); 
 		}); 
+	}, 
+
+	getInactiveCoursesAndUsers = function(kind, count, dateType) {
+		console.log(kind, count, dateType); 
+		startSpinner();
+		if (kind == "Kurse") {
+			$.ajax({url: "src/php/functions.php?command=getInactiveCourses", data: {count: count, dateType: dateType}}).done(
+			function(data) {
+				var json = data; 
+				var object = jQuery.parseJSON(json); 
+				console.log(object); 
+				$(that).trigger('showInactiveCourses', object);
+				stopSpinner();
+			});
+		} else {
+			$.ajax({url: "src/php/functions.php?command=getInactiveUsers", data: {count: count, dateType: dateType}}).done(
+			function(data) {
+				var json = data; 
+				var object = jQuery.parseJSON(json); 
+				//console.log(object); 
+				$(that).trigger('showInactiveCoursesAndUsers', object);
+				stopSpinner();
+			});
+		} 
 	}, 
 
 	getLoginStatistics = function() {
@@ -123,5 +150,6 @@ StatisticsModule.MainModel = (function() {
 
 	that.init = init; 
 	that.getCounts = getCounts; 
+	that.getInactiveCoursesAndUsers = getInactiveCoursesAndUsers; 
 	return that; 
 })(); 

@@ -4,6 +4,9 @@
     //getCounts("1277935200", "1343772000"); 
     //getCategoryData(); 
     getCategories();
+    //getInactiveUsers(); 
+    //getInactiveCourses(); 
+    //getInactiveCoursesAndUsers(); 
     
     function addToValue($key, $courseids, $value) {
         $courseidstr = array_key_exists($key, $courseids) ? ("(".implode(",", $courseids[$key]).")") : "";
@@ -35,7 +38,7 @@
                 $sql2 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
                 $coursesOfStudies = array(); 
                 $coursesOfStudies = $DB->get_records_sql($sql2);
-                //$coursesOfStudies = addAllToValue($coursesOfStudies); 
+                $coursesOfStudies = addAllToValue($coursesOfStudies); 
                 //$value = addToValue($key, $courseids, $value); 
                 $institutes[$key1]->subcategory = $coursesOfStudies; 
             }
@@ -374,6 +377,31 @@
         $statsdata["all"] = $allCategoriesArray;
         echo json_encode($statsdata);
     
+    }
+
+    function getInactiveCoursesAndUsers() {
+        //$inactiveCoursesAndUsers = array(); 
+        //$inactiveCoursesAndUsers["inactiveCourses"] = getInactiveCourses(); 
+        $inactiveCoursesAndUsers = getInactiveUsers(); 
+        echo json_encode($inactiveCoursesAndUsers);
+    }
+
+    function getInactiveUsers() {
+        global $DB;
+        $time = strtotime("-1 year", time());
+        $sql = "SELECT id, firstname, lastname, email, lastlogin, DATE_FORMAT(FROM_UNIXTIME(lastlogin), '%m.%Y') AS 'date_formatted' FROM mdl_user  WHERE lastlogin < $time ORDER BY lastlogin";
+        $result = $DB->get_records_sql($sql);
+        //echo json_encode($result); 
+        return $result;
+    }
+
+    function getInactiveCourses() {
+        global $DB;
+        $time = strtotime("-1 year", time());
+        $sql = "SELECT id, category, fullname, timemodified, DATE_FORMAT(FROM_UNIXTIME(timemodified), '%m.%Y') AS 'date_formatted' FROM mdl_course  WHERE timemodified < $time ORDER BY timemodified";
+        $result = $DB->get_records_sql($sql);
+        //echo json_encode($result); 
+        return $result;
     }
 
     function getSubscriberCount($courseids) {

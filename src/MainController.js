@@ -14,7 +14,22 @@ StatisticsModule.MainController = (function() {
 		$(mainModel).on('drawChart', onDrawChart); 
 		$(mainModel).on('addTagCloud', onAddTagCloud); 
 		$(mainModel).on('changeCountValues', onChangeCountValues); 
+		$(mainModel).on('showInactiveCoursesAndUsers', onShowInactiveCoursesAndUsers); 
+		$(mainModel).on('showInactiveCourses', onShowInactiveCourses);
 		$(statisticsView).on('timeperiodValuesChanged', onTimeperiodValuesChanged); 
+		$(categoryStatisticsView).on('getInactiveCoursesAndUsers', onGetInactiveCoursesAndUsers); 
+	}, 
+
+	onGetInactiveCoursesAndUsers = function(event, kind, count, dateType) {
+		mainModel.getInactiveCoursesAndUsers(kind, count, dateType); 
+	};
+
+	onShowInactiveCourses = function(event, object) {
+		categoryStatisticsView.showInactiveCourses(object); 
+	}, 
+
+	onShowInactiveCoursesAndUsers = function(event, object) {
+		categoryStatisticsView.showInactiveCoursesAndUsers(object); 
 	}, 
 
 	onInitTimePeriod = function(event, object) {

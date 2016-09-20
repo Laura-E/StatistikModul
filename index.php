@@ -7,9 +7,11 @@
             <link rel="stylesheet" href="libs/material-design-iconic-font/css/material-design-iconic-font.min.css">
             <link rel="stylesheet" href="libs/jquery.jqplot.1.0.9/jquery.jqplot.min.css">
             <link rel="stylesheet" type="text/css" href="libs/jQCloud/dist/jqcloud.css" />
-            <link rel="stylesheet" href="libs/bootstrap-3.3.4/css/bootstrap.min.css">
+            <link rel="stylesheet" href="libs/bootstrap-3.3.7/css/bootstrap.min.css">
             <link rel="stylesheet" href="libs/jquery-ui-1.11.4.custom/jquery-ui.css">
             <link rel="stylesheet" href="libs/jQRangeSlider-master/css/iThing.css" type="text/css" />
+            <link rel="stylesheet" href="libs/DataTables-1.10.12/media/css/jquery.dataTables.min.css" />
+            <!--<link rel="stylesheet" href="libs/simplePagination/css/style.css">-->
 		    <link rel="stylesheet" href="res/css/style.css" id="stylesheet">
             <link rel="stylesheet" type="text/css" href="res/css/print.css" media="print">  
 
@@ -246,18 +248,82 @@
                         <a id="a" href="#"></a>
                     </div>
 
+                    <div class="row" id="categoryNumbers">
+                        <div class="col-md-4">
+                            <div class="title box"><div>Materialien</div><br /><div class="number" id="categoryMaterialsCount"></div></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="title box"><div>Teilnehmer</div><br /><div class="number" id="categorySubscriberCount"></div></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="title box"><div>Dozenten</div><br /><div class="number" id="categoryTrainerCount"></div></div>
+                        </div>
+                    </div>
+                    <br />
+
                     <table class="table table-bordered" id="categoryStatisticsCompareTable">
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Trainer</th>
+                                <th>Dozenten</th>
                                 <th>Teilnehmer</th>
                         </thead>
                         <tbody id="categoryStatisticsCompareTableItemContainer">
                             
                         </tbody>
                     </table>
-                    
+
+                    <div class="box" id="inactiveCoursesAndUsersBox">
+                        <div class="title">Inaktive</div>
+                        <select id="inactivityKindSelect">
+                            <option>Kurse</option>
+                            <option>Nutzer</option>
+                        </select>
+                        <select id="inactiveUsersPeriodSelect">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>5</option>
+                        </select>
+                        <select id="inactiveUsersPeriodYearMonthSelect">
+                            <option>Jahr/e</option>
+                            <option>Monat/e</option>
+                        </select>
+                        <button type="button" class="btn btn-primary" id="searchInactiveUsersButton">Suchen</button>
+                        <br class="clear" />
+                        <div id="inactiveCoursesAndUsersTableContainer"></div>
+                        <!--<table class="table table-bordered" id="inactiveUsersTable">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Vorname</th>
+                                    <th>Nachname</th>
+                                    <th>Email</th>
+                                    <th>Letztes Login</th>
+                                </tr>
+                            </thead>
+                            <br class="clear" />
+                            <tbody id="inactiveUsersTableItemContainer">
+
+                            </tbody>
+                        </table>
+
+                        <table class="table table-bordered" id="inactiveCoursesTable">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Titel</th>
+                                    <th>Letzte Aktivität</th>
+                                </tr>
+                            </thead>
+                            <br class="clear" />
+                            <tbody id="inactiveCoursesTableItemContainer">
+
+                            </tbody>
+                        </table>-->
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <ul class="pagination pagination-lg pager" id="myPager"></ul>
+                    </div>
                     <!--<div class="panel-group" id="accordion"></div>-->
                     <!--<div id="categoryStatisticsChart"></div>-->
                 </div>
@@ -336,6 +402,58 @@
             </tr>
         </script>
 
+        <script type="text/html" id="inactiveUsersTable-tpl">
+            <table class="table table-bordered" id="<%= id %>">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Vorname</th>
+                        <th>Nachname</th>
+                        <th>Email</th>
+                        <th>Letztes Login</th>
+                    </tr>
+                </thead>
+                <br class="clear" />
+                <tbody id="inactiveUsersTableItemContainer">
+
+                </tbody>
+            </table>
+        </script>
+
+        <script type="text/html" id="inactiveCoursesTable-tpl">
+            <table class="table table-bordered" id="<%= id %>">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Titel</th>
+                        <th>Letzte Aktivität</th>
+                    </tr>
+                </thead>
+                <br class="clear" />
+                <tbody id="inactiveCoursesTableItemContainer">
+
+                </tbody>
+            </table>
+        </script>
+
+        <script type="text/html" id="inactiveUsersTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= userId %></td>
+                <td><%= firstname %></td>
+                <td><%= lastname %></td>
+                <td><%= email %></td>
+                <td><%= lastlogin %></td>
+            </tr>
+        </script>
+
+        <script type="text/html" id="inactiveCoursesTableItem-tpl">
+            <tr id="<%= id %>">
+                <td><%= courseId %></td>
+                <td><%= name %></td>
+                <td><%= lastActivity %></td>
+            </tr>
+        </script>
+
         <!--<script type="text/html" id="categoryListItem-tpl">
             <div class="panel panel-default" id="<%= id %>">
                 <a href="#<%= collapseId %>" class="panel-heading" data-toggle="collapse" data-parent="#accordion">
@@ -360,8 +478,10 @@
         <script type="text/javascript" src="libs/jquery-2.1.4.js"></script>
         <script type="text/javascript" src="libs/underscore.js"></script>
         <script type="text/javascript" src="libs/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
-        <script type="text/javascript" src="libs/bootstrap-3.3.4/js/bootstrap.js"></script>
+        <script type="text/javascript" src="libs/bootstrap-3.3.7/js/bootstrap.js"></script>
         <script type="text/javascript" src="libs/spin.js"></script>
+        <script type="text/javascript" src="libs/DataTables-1.10.12/media/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="libs/DataTables-1.10.12/plugins/sorting/date-de.js"></script>
         
         <script type="text/javascript" src="libs/jQRangeSlider-master/jQRangeSliderMouseTouch.js"></script>
         <script type="text/javascript" src="libs/jQRangeSlider-master/jQRangeSliderDraggable.js"></script>
@@ -384,7 +504,6 @@
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pointLabels.js"></script>
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pieRenderer.js"></script>
         <script type="text/javascript" src="libs/jQCloud/dist/jqcloud.js"></script>
-        <!--<script type="text/javascript" src="https://mistic100.github.io/jQCloud/dist/jqcloud2/dist/jqcloud.js"></script>-->
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/amcharts.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/serial.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/themes/light.js"></script>
@@ -400,6 +519,10 @@
         <script src="src/CategoryStatisticsTableItem.js"></script>
         <script src="src/CategoryStatisticsSelectItem.js"></script>
         <script src="src/CategoryStatisticsCompareTableItem.js"></script>
+        <script src="src/InactiveUsersTable.js"></script>
+        <script src="src/InactiveCoursesTable.js"></script>
+        <script src="src/InactiveUsersTableItem.js"></script>
+        <script src="src/InactiveCoursesTableItem.js"></script>
 
         <script>
             StatisticsModule.init();    

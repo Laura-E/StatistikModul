@@ -6,9 +6,20 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	categoryData = {}, 
 
 	init = function() {
+		//$('#inactiveCoursesTable').hide(); 
+		//$('#inactiveUsersTable').hide();
 		addCategoryStatisticsSelectItem(); 
 		$("#categoryStatisticsOptionsAddButton").on('click', onCategoryStatisticsOptionsAddButtonClick); 
+		$("#searchInactiveUsersButton").on('click', onSearchInactiveUsersButtonClick); 
 		return that; 
+	}, 
+
+	onSearchInactiveUsersButtonClick = function(event) {
+		var kind = $("#inactivityKindSelect").val(); 
+		var count = $("#inactiveUsersPeriodSelect").val(); 
+		var dateType = $("#inactiveUsersPeriodYearMonthSelect").val(); 
+		dateType = ((dateType == "Jahr/e") ? "year" : "month");
+		$(that).trigger("getInactiveCoursesAndUsers", [kind, count, dateType]);
 	}, 
 
 	onCategoryStatisticsOptionsAddButtonClick = function(event) {
@@ -70,10 +81,7 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		    	var color = data[i]["color"];
 		    	var id = data[i]["id"];
 		        $("#" + data[i]["attr"]["id"]).css("color", color);
-		        //$('#facultySelect').selectpicker();
 		        $("#facultySelect").append("<option value='"+ id + "'>" + text + "</option>");
-		        //$("#facultySelect").selectpicker('refresh');
-				//$("#facultySelect").selectpicker('val', "-");
 		        count++;
 		    }
 		}, 100);
@@ -83,6 +91,69 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	onCategoryStatisticsModalShow = function(event) {
 		drawPieChart(event.data.words);
 	},
+
+	showInactiveCoursesAndUsers = function(inactiveUsers) {
+		//$('#inactiveCoursesTable').hide(); 
+		//$(".table-responsive").hide(); 
+		//$('#inactiveUsersTable').show();
+		$("#inactiveCoursesAndUsersTableContainer").empty(); 
+		addInactiveUsersTable(); 
+		//$(".pages").empty(); 
+		for (var i in inactiveUsers) {
+			var inactiveUser = inactiveUsers[i];
+			var id = inactiveUser["id"];
+			var firstname = inactiveUser["firstname"];
+			var lastname = inactiveUser["lastname"];
+			var email = inactiveUser["email"];
+			var lastlogin = inactiveUser["date_formatted"];
+			addInactiveUsersTableItem(id, firstname, lastname, email, lastlogin);
+		} 
+		$('#inactiveUsersTable').DataTable({
+		     columnDefs: [
+		       { type: 'de_date', targets: 4 }
+		     ], 
+		     "language": {
+	            "lengthMenu": "_MENU_ Ergebnisse pro Seite",
+	            "zeroRecords": "Es konnten keine Ergebnisse gefunden werden",
+	            "info": "Seite _PAGE_ von _PAGES_",
+	            "infoEmpty": "Keine Ergebnisse verfügbar"
+	        }
+		  }); 
+	}, 
+
+	showInactiveCourses = function(inactiveCourses) {
+		//$('#inactiveUsersTable').hide(); 
+		//$(".table-responsive").hide(); 
+		$("#inactiveCoursesAndUsersTableContainer").empty(); 
+		addInactiveCoursesTable(); 
+		//$('#inactiveCoursesTable').show(); 
+		//$(".pages").empty(); 
+		for (var i in inactiveCourses) {
+			var inactiveCourse = inactiveCourses[i];
+			var id = inactiveCourse["id"];
+			var name = inactiveCourse["fullname"];
+			var lastActivity = inactiveCourse["date_formatted"];
+			addInactiveCoursesTableItem(id, name, lastActivity);
+		} 
+		$('#inactiveCoursesTable').DataTable({
+		     columnDefs: [
+		       { type: 'de_date', targets: 2 }
+		     ], 
+		     "language": {
+	            "lengthMenu": "_MENU_ Ergebnisse pro Seite",
+	            "zeroRecords": "Es konnten keine Ergebnisse gefunden werden",
+	            "search": "Suche:",
+	            "info": "Seite _PAGE_ von _PAGES_",
+	            "infoEmpty": "Keine Ergebnisse verfügbar", 
+	            "paginate": {
+			        "first":      "Anfang",
+			        "last":       "Ende",
+			        "next":       "Vor",
+			        "previous":   "Zurück"
+			    },
+	        }
+		  }); 
+	}, 
 
 	drawPieChart = function(words) {
 		var data = [], chart_labels = [], chart_series_colors = [];
@@ -154,6 +225,81 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		categoryStatisticsTableItemCount++;
 	},
 
+
+	makeInactiveUsersTable = function(options) {
+		var item = StatisticsModule.InactiveUsersTable().init({
+			id: options.id
+		}); 
+		var $el = item.render(); 
+		$("#inactiveCoursesAndUsersTableContainer").append($el); 
+	}, 
+
+	addInactiveUsersTable = function() {
+		makeInactiveUsersTable({
+			id: "inactiveUsersTable"
+		});
+	},
+
+	makeInactiveCoursesTable = function(options) {
+		var item = StatisticsModule.InactiveCoursesTable().init({
+			id: options.id
+		}); 
+		var $el = item.render(); 
+		$("#inactiveCoursesAndUsersTableContainer").append($el); 
+	}, 
+
+	addInactiveCoursesTable = function() {
+		makeInactiveCoursesTable({
+			id: "inactiveCoursesTable"
+		});
+	},
+
+
+
+	makeInactiveUsersTableItem = function(options) {
+		var item = StatisticsModule.InactiveUsersTableItem().init({
+			id: options.id,
+			userId: options.userId, 
+			firstname: options.firstname,
+			lastname: options.lastname,
+			email: options.email, 
+			lastlogin: options.lastlogin
+		}); 
+		var $el = item.render(); 
+		$("#inactiveUsersTableItemContainer").append($el); 
+	}, 
+
+	addInactiveUsersTableItem = function(id, firstname, lastname, email, lastlogin) {
+		makeInactiveUsersTableItem({
+			id: "inactiveUsersTableItem" + id, 
+			userId: id, 
+			firstname: firstname,
+			lastname: lastname, 
+			email: email, 
+			lastlogin: lastlogin
+		});
+	},
+
+	makeInactiveCoursesTableItem = function(options) {
+		var item = StatisticsModule.InactiveCoursesTableItem().init({
+			id: options.id,
+			courseId: options.courseId, 
+			name: options.name,
+			lastActivity: options.lastActivity
+		}); 
+		var $el = item.render(); 
+		$("#inactiveCoursesTableItemContainer").append($el); 
+	}, 
+
+	addInactiveCoursesTableItem = function(id, name, lastActivity) {
+		makeInactiveCoursesTableItem({
+			id: "inactiveCoursesTableItem" + id, 
+			courseId: id, 
+			name: name,
+			lastActivity: lastActivity
+		});
+	},
+
 	makeCategoryStatisticsCompareTableItem = function(options) {
 		var item = StatisticsModule.CategoryStatisticsCompareTableItem().init({
 			id: options.id, 
@@ -185,6 +331,10 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatisticsSelectItemContainer").append($el); 
 	}, 
 
+	/*showCategoryStatistics = function(all) {
+
+	}, */
+
 	addCategoryStatisticsSelectItem = function() {
 		makeCategoryStatisticsSelectItem({
 			id: "categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount
@@ -199,11 +349,18 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		   $("#courseOfStudiesSelect").hide();
 
 		   var all = categoryData["all"][selected];
+		   //showCategoryStatistics(all); 
 		   var name = all["name"];
 		   var institutes = all["subcategory"];
 		   var subscriber = all["subscriber"];
 		   var trainer = all["trainer"];
 		   var materials = all["materials"];
+
+		   console.log(materials, subscriber, trainer); 
+		   $("#categoryMaterialsCount").html(materials); 
+		   $("#categorySubscriberCount").html(subscriber); 
+		   $("#categoryTrainerCount").html(trainer); 
+
 		   $("#categoryStatisticsCompareTableItem" + categoryStatisticsSelectItemCount).remove(); 
 		   addCategoryStatisticsCompareTableItem(categoryStatisticsSelectItemCount, name, trainer, subscriber, materials);
 
@@ -231,6 +388,11 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		   	var subscriber = all["subscriber"];
 		   	var trainer = all["trainer"];
 		   	var materials = all["materials"];
+
+		   	$("#categoryMaterialsCount").html(materials); 
+		   	$("#categorySubscriberCount").html(subscriber); 
+		   	$("#categoryTrainerCount").html(trainer); 
+
 		   	$("#categoryStatisticsCompareTableItem" + categoryStatisticsSelectItemCount).remove(); 
 		   	addCategoryStatisticsCompareTableItem(categoryStatisticsSelectItemCount, name, trainer, subscriber, materials);
 
@@ -257,6 +419,11 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		   	var subscriber = all["subscriber"];
 		   	var trainer = all["trainer"];
 		   	var materials = all["materials"];
+
+		   	$("#categoryMaterialsCount").html(materials); 
+		   	$("#categorySubscriberCount").html(subscriber); 
+		   	$("#categoryTrainerCount").html(trainer); 
+
 		   	$("#categoryStatisticsCompareTableItem" + categoryStatisticsSelectItemCount).remove(); 
 		   	addCategoryStatisticsCompareTableItem(categoryStatisticsSelectItemCount, name, trainer, subscriber, materials);
 			$('#a').focus();
@@ -264,6 +431,8 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	}; 
 
 	that.addTagCloud = addTagCloud; 
+	that.showInactiveCoursesAndUsers = showInactiveCoursesAndUsers;
+	that.showInactiveCourses = showInactiveCourses; 
 	that.init = init; 
 	return that; 
 })();

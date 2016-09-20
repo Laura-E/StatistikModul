@@ -21,8 +21,44 @@
             $start = $_GET['start']; 
             $end = $_GET['end']; 
             getCounts($start, $end); 
+            break;
+        case 'getInactiveUsers':
+            $count = $_GET['count']; 
+            $dateType = $_GET['dateType']; 
+            getInactiveUsers($count, $dateType); 
+            break; 
+        case 'getInactiveCourses':
+            $count = $_GET['count']; 
+            $dateType = $_GET['dateType']; 
+            getInactiveCourses($count, $dateType); 
+            break; 
         default: 
             return; 
+    }
+
+   /* function getInactiveCoursesAndUsers($count, $dateType) {
+        //$inactiveCoursesAndUsers = array(); 
+        //$inactiveCoursesAndUsers["inactiveCourses"] = getInactiveCourses($count, $dateType); 
+        //$inactiveCoursesAndUsers["inactiveUsers"] = getInactiveUsers($count, $dateType); 
+        $inactiveCoursesAndUsers = getInactiveUsers($count, $dateType); 
+        echo json_encode($inactiveCoursesAndUsers);
+    }*/
+
+    function getInactiveUsers($count, $dateType) {
+        global $DB;
+        $time = strtotime("-".$count." ".$dateType, time());
+        $sql = "SELECT id, firstname, lastname, email, DATE_FORMAT(FROM_UNIXTIME(lastlogin), '%d.%m.%Y') AS 'date_formatted' FROM mdl_user  WHERE deleted = 0 AND lastlogin < $time AND lastlogin != 0 ORDER BY lastlogin";
+        $result = $DB->get_records_sql($sql);
+        echo json_encode($result);
+    }
+
+    function getInactiveCourses($count, $dateType) {
+        global $DB;
+        $time = strtotime("-".$count." ".$dateType, time());
+        $sql = "SELECT stats.id, stats.courseid, c.fullname, max(stats.timeend) AS maxtimeend, DATE_FORMAT(FROM_UNIXTIME(max(timeend)), '%d.%m.%Y') AS 'date_formatted' FROM mdl_stats_user_monthly AS stats, mdl_course AS c WHERE stats.courseid = c.id AND stats.timeend < $time GROUP BY courseid";
+        //$sql = "SELECT id, category, fullname, DATE_FORMAT(FROM_UNIXTIME(timemodified), '%d.%m.%Y') AS 'date_formatted' FROM mdl_course  WHERE timemodified < $time ORDER BY timemodified";
+        $result = $DB->get_records_sql($sql);
+        echo json_encode($result);
     }
 
     function getMinAndMaxDate() {
@@ -222,6 +258,8 @@
 
 
         }
+        $statsdata["courses"] = $courses; 
+        $statsdata["parents"] = $parents; 
         $statsdata["all"] = $allCategoriesArray;
         echo json_encode($statsdata);
     
@@ -272,8 +310,8 @@
                 $categories[$key]->trainer = getTrainerCount($courseidstr);
                 $categories[$key]->subscriber = getSubscriberCount($courseidstr);
                 $categories[$key]->materials = getMaterialsCount($courseidstr);
-                //$categories[$key]->courseids = $courseidstr;
             }
+            //$categories[$key]->courseids = $courseidstr;
 
         }
         return $categories;
@@ -293,6 +331,13 @@
                     // is either course category itself or a different parent
                     // (if there's a parent category between course category
                     // and root category).
+                    $categoryparents = array_merge(
+                        $parents[$data->category], array($data->category));
+                    $maincategory = $categoryparents[1];
+                    //echo json_encode($categoryparents); 
+                } else if (isset($parents[$data->category][1]) &&
+                    $parents[$data->category][1] ==
+                        $topcategory) {
                     $categoryparents = array_merge(
                         $parents[$data->category], array($data->category));
                     $maincategory = $categoryparents[1];
