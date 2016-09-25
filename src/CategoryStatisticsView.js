@@ -9,9 +9,68 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		//$('#inactiveCoursesTable').hide(); 
 		//$('#inactiveUsersTable').hide();
 		addCategoryStatisticsSelectItem(); 
+		//initCategoryPlot(); 
 		$("#categoryStatisticsOptionsAddButton").on('click', onCategoryStatisticsOptionsAddButtonClick); 
 		$("#searchInactiveUsersButton").on('click', onSearchInactiveUsersButtonClick); 
+
+
 		return that; 
+	}, 
+
+	initCategoryPlot = function(plot, chartData, title) {
+		console.log(chartData); 
+		setTimeout(function () {
+			plot1 = $.jqplot(plot, [chartData], {
+            /*seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                rendererOptions: {
+	                barDirection: 'vertical', 
+	                barWidth: 20, 
+	                color: "teal", 
+	                shadowOffset: 0
+	            },
+                pointLabels: { show: true, formatString: '%d' }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer
+                }
+            },
+            highlighter: { show: false }, 
+            grid: {drawGridlines: false, background: 'transparent', borderColor: 'transparent', shadow: false, drawBorder: true}
+        });*/
+			//plot1 = $.jqplot('categoriesChart', [[[2,"IE"], [6,"Firefox"], [7,"Safari"], [10,"Chrome"]]], {
+	            captureRightClick: true,
+	            title: title, 
+	            seriesDefaults:{
+	                renderer:$.jqplot.BarRenderer,
+	                shadowAngle: 135,
+	                rendererOptions: {
+	                    barDirection: 'horizontal', 
+	                    color: "teal", 
+	                    fillToZero: true, 
+	                    shadowOffset: 0
+	                    //barPadding: -50
+	                },
+	                pointLabels: {show: true, location: 'e', edgeTolerance: -15, formatString: '%d'}
+	            },
+	            axes: {
+	                yaxis: {
+	                    renderer: $.jqplot.CategoryAxisRenderer
+	                }, 
+	                xaxis: {
+	                	tickOptions: {
+					        show: false
+					    },
+					    rendererOptions: {
+					        drawBaseline: false
+					    }
+	                }
+	            },
+	            grid: {drawGridlines: false, background: 'transparent', borderColor: 'transparent', shadow: false, drawBorder: true},
+		    });
+	    }, 100);
+		
 	}, 
 
 	onSearchInactiveUsersButtonClick = function(event) {
@@ -32,24 +91,24 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		var words = [];
 		for (var key in object) {
 			console.log(key); 
-			if(key != "all") {
-			var faculty = object[key];
-			var text = faculty["name"];
-			var weight = faculty["courses"];
-			var color = faculty["color"];
-			var materials = faculty["materials"];
-			var subscriber = faculty["subscriber"];
-			var trainer = faculty["trainer"];
-			var id = faculty["id"];
-			var word = {};
-			word['text'] = text;
-			word['weight'] = weight;
-			word['color'] = color;
-			word['materials'] = materials;
-			word['subscriber'] = subscriber;
-			word['trainer'] = trainer;
-			word['id'] = id;
-			words.push(word); 
+			if(key != "all" && key != "parents" && key != "courses") {
+				var faculty = object[key];
+				var text = faculty["name"];
+				var weight = faculty["courses"];
+				var color = faculty["color"];
+				var materials = faculty["materials"];
+				var subscriber = faculty["subscriber"];
+				var trainer = faculty["trainer"];
+				var id = faculty["id"];
+				var word = {};
+				word['text'] = text;
+				word['weight'] = weight;
+				word['color'] = color;
+				word['materials'] = materials;
+				word['subscriber'] = subscriber;
+				word['trainer'] = trainer;
+				word['id'] = id;
+				words.push(word); 
 			}
 		}
 		$("#instituteSelect").hide();
@@ -62,7 +121,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	}, 
 
 	initCloud = function(words) {
-
 		$("#tagcloud").jQCloud(words, {
 	      	autoResize: true, 
 	      	removeOverflowing: false, 
@@ -74,8 +132,11 @@ StatisticsModule.CategoryStatisticsView = (function() {
 
 		setTimeout(function () {
 		    var obj = $("#tagcloud").data("jqcloud");
-		    var data = obj.word_array;
-		    var count = 0;
+		    //var data = obj.word_array;
+		    var level = 1;
+		    addCategorySelectItem(level); 
+
+		    /*var count = 0;
 		    for (var i in data) {
 		    	var text = data[i]["text"];
 		    	var color = data[i]["color"];
@@ -83,12 +144,13 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		        $("#" + data[i]["attr"]["id"]).css("color", color);
 		        $("#facultySelect").append("<option value='"+ id + "'>" + text + "</option>");
 		        count++;
-		    }
+		    }*/
 		}, 100);
 		$("#categoryStatisticsModal").on('shown.bs.modal', {'words': words}, onCategoryStatisticsModalShow); 
-	}, 
+	},  
 
 	onCategoryStatisticsModalShow = function(event) {
+		console.log(event.data.words); 
 		drawPieChart(event.data.words);
 	},
 
@@ -312,9 +374,9 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatisticsCompareTableItemContainer").append($el); 
 	}, 
 
-	addCategoryStatisticsCompareTableItem = function(count, title, trainerCount, subscriberCount, materialsCount) {
+	addCategoryStatisticsCompareTableItem = function(title, trainerCount, subscriberCount, materialsCount) {
 		makeCategoryStatisticsCompareTableItem({
-			id: "categoryStatisticsCompareTableItem" + count, 
+			id: "categoryStatisticsCompareTableItem" + categoryStatisticsCompareTableItemCount, 
 			title: title, 
 			trainerCount: trainerCount, 
 			subscriberCount: subscriberCount, 
@@ -335,13 +397,149 @@ StatisticsModule.CategoryStatisticsView = (function() {
 
 	}, */
 
+	getData = function() {
+		var data = categoryData["all"]; 
+		var allSelects = $("#categoryStatisticsSelectItem0 select"); 
+		var length = allSelects.length; 
+		allSelects.each(function(index) {
+		  	var selected = $(this).find("option:selected").val();
+
+		   	if(index == length-1) {
+		   		var subscriber = data[selected]["subscriber"]; 
+		   		var trainer = data[selected]["trainer"];
+		   		var materials = data[selected]["materials"];
+		   		console.log(subscriber, trainer, materials); 
+				$("#categorySubscriberCount").html(subscriber); 
+				$("#categoryTrainerCount").html(trainer); 
+				$("#categoryMaterialsCount").html(materials);
+		   	}
+
+		  	if('subcategory' in data[selected]) {
+		  		data = data[selected]["subcategory"];
+		  	} else {
+		  		data = false; 
+		  	}
+		});
+		console.log(data); 
+		return data; 
+	}, 
+
+	addCategorySelectItem = function(level) {
+		var data = getData(); 
+		if(data != false) {
+			if ($("#categoryStatisticsSelectItem0 select").length < level) {
+				$("#categoryStatisticsSelectItem0").append("<select></select>");
+			}
+			$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").empty();
+			$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").append("<option>-</option>");
+			$("#categoryStatisticsCompareTableItemContainer").empty(); 
+			var materialsChartData = []; 
+			var trainerChartData = []; 
+			var subscriberChartData = []; 
+			for (var i in data) {
+			    var name = data[i]["name"];
+			    //var color = data[i]["color"];
+			    var id = data[i]["id"];
+
+			    var subscriber = parseInt(data[i]["subscriber"]);
+			    var trainer = parseInt(data[i]["trainer"]);
+			    var materials = parseInt(data[i]["materials"]);
+
+			    addCategoryStatisticsCompareTableItem(name, trainer, subscriber, materials);
+
+			    subscriberChartData = addPlotValue(subscriberChartData, name, subscriber); 
+			    trainerChartData = addPlotValue(trainerChartData, name, trainer); 
+			    materialsChartData = addPlotValue(materialsChartData, name, materials); 
+
+			    $("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").append("<option value='"+ id + "'>" + name + "</option>");
+			    
+			}
+		}
+		
+		$("#categoriesSubscriberChart").empty(); 
+		$("#categoriesTrainerChart").empty(); 
+		$("#categoriesMaterialsChart").empty(); 
+
+		subscriberChartData.sort(function(a, b) {
+		    return a[0] - b[0];
+		});
+		trainerChartData.sort(function(a, b) {
+		    return a[0] - b[0];
+		});
+		materialsChartData.sort(function(a, b) {
+		    return a[0] - b[0];
+		});
+		if(subscriberChartData.length != 0) initCategoryPlot('categoriesSubscriberChart', subscriberChartData, "Teilnehmer"); 
+		if(trainerChartData.length != 0) initCategoryPlot('categoriesTrainerChart', trainerChartData, "Dozenten"); 
+		if(materialsChartData.length != 0) initCategoryPlot('categoriesMaterialsChart', materialsChartData, "Materialien"); 
+
+		/*$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").on('change', function(){
+			console.log($("#categoryStatisticsSelectItem0 select:nth-child(n+" + level + ")"));
+			$("#categoryStatisticsSelectItem0 select:nth-child(n+" + (level+1) + ")").remove(); 
+			var selected = $(this).find("option:selected").val();
+		   	console.log("selected", selected, 'subcategory' in data[selected]); 
+		   	if('subcategory' in data[selected]) {
+		   		data = data[selected]["subcategory"];
+		   		++level; 
+				addCategorySelectItem(data, level);
+		   	}
+		});*/
+	},
+
+	addPlotValue = function(chartData, name, value) {
+		var chartDataOne = [];
+		if (!isNaN(value) && value != 0) {
+			chartDataOne[1] = name; 
+			chartDataOne[0] = value; 
+			chartData.push(chartDataOne); 
+		}
+		return chartData; 
+	},
+	
+	dynamicSort = function(property) {
+	    var sortOrder = 1;
+	    if(property[0] === "-") {
+	        sortOrder = -1;
+	        property = property.substr(1);
+	    }
+	    return function (a,b) {
+	        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
+	        return result * sortOrder;
+	    }
+	}, 
+
 	addCategoryStatisticsSelectItem = function() {
 		makeCategoryStatisticsSelectItem({
 			id: "categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount
 		});
+
+		$("#categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount).on('change', "select", function(){
+			console.log($(this), $(this).index());
+			level = $(this).index()+1;
+			$("#categoryStatisticsSelectItem0 select:nth-child(n+" + (level+1 ) + ")").remove(); 
+			/*var selected = $(this).find("option:selected").val();
+		   	console.log("selected", selected, 'subcategory' in data[selected]); 
+		   	if('subcategory' in data[selected]) {
+		   		data = data[selected]["subcategory"];
+		   		++level; 
+				addCategorySelectItem(level);
+		   	}*/
+		   	++level;
+		   	addCategorySelectItem(level);
+			/*console.log($("#categoryStatisticsSelectItem0 select:nth-child(n+" + level + ")"));
+			$("#categoryStatisticsSelectItem0 select:nth-child(n+" + (level+1) + ")").remove(); 
+			var selected = $(this).find("option:selected").val();
+		   	console.log("selected", selected, 'subcategory' in data[selected]); 
+		   	if('subcategory' in data[selected]) {
+		   		data = data[selected]["subcategory"];
+		   		++level; 
+				addCategorySelectItem(data, level);
+		   	}*/
+		});
+
 		categoryStatisticsSelectItemCount++;
 
-		$('#facultySelect').on('change', function(){
+		/*$('#facultySelect').on('change', function(){
 		   var selected = $('#facultySelect option:selected').val();
 		   console.log("selected", selected); 
 		   var id = $('#facultySelect option:selected').attr("value"); 
@@ -349,7 +547,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		   $("#courseOfStudiesSelect").hide();
 
 		   var all = categoryData["all"][selected];
-		   //showCategoryStatistics(all); 
 		   var name = all["name"];
 		   var institutes = all["subcategory"];
 		   var subscriber = all["subscriber"];
@@ -363,7 +560,46 @@ StatisticsModule.CategoryStatisticsView = (function() {
 
 		   $("#categoryStatisticsCompareTableItem" + categoryStatisticsSelectItemCount).remove(); 
 		   addCategoryStatisticsCompareTableItem(categoryStatisticsSelectItemCount, name, trainer, subscriber, materials);
+		   
+		   	var chartData = [[["IE", 2], ["Firefox", 6], ["Safari", 7], ["Chrome", 10]]]; 
+			initCategoryPlot(chartData); 
+		   
+		   $("#instituteSelect").empty(); 
+		   $("#instituteSelect").append("<option>-</option>");
+		   for (var i in institutes) {
+		   		var id = institutes[i]["id"];
+		    	var text = institutes[i]["name"];
+		        $("#instituteSelect").append("<option value='"+ id + "'>" + text + "</option>");
+		    }
 
+		    $('#a').focus();
+		});*/
+
+		/*$('#facultySelect').on('change', function(){
+		   var selected = $('#facultySelect option:selected').val();
+		   console.log("selected", selected); 
+		   var id = $('#facultySelect option:selected').attr("value"); 
+		   $("#instituteSelect").show();
+		   $("#courseOfStudiesSelect").hide();
+
+		   var all = categoryData["all"][selected];
+		   var name = all["name"];
+		   var institutes = all["subcategory"];
+		   var subscriber = all["subscriber"];
+		   var trainer = all["trainer"];
+		   var materials = all["materials"];
+
+		   console.log(materials, subscriber, trainer); 
+		   $("#categoryMaterialsCount").html(materials); 
+		   $("#categorySubscriberCount").html(subscriber); 
+		   $("#categoryTrainerCount").html(trainer); 
+
+		   $("#categoryStatisticsCompareTableItem" + categoryStatisticsSelectItemCount).remove(); 
+		   addCategoryStatisticsCompareTableItem(categoryStatisticsSelectItemCount, name, trainer, subscriber, materials);
+		   
+		   	var chartData = [[["IE", 2], ["Firefox", 6], ["Safari", 7], ["Chrome", 10]]]; 
+			initCategoryPlot(chartData); 
+		   
 		   $("#instituteSelect").empty(); 
 		   $("#instituteSelect").append("<option>-</option>");
 		   for (var i in institutes) {
@@ -427,7 +663,7 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		   	$("#categoryStatisticsCompareTableItem" + categoryStatisticsSelectItemCount).remove(); 
 		   	addCategoryStatisticsCompareTableItem(categoryStatisticsSelectItemCount, name, trainer, subscriber, materials);
 			$('#a').focus();
-		});
+		});*/
 	}; 
 
 	that.addTagCloud = addTagCloud; 

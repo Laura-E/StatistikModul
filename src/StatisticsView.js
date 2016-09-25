@@ -10,17 +10,10 @@ StatisticsModule.StatisticsView = (function() {
 	accessStatisticsTableItemCount = 0, 
 	loginStatisticsTableItemCount = 0, 
 	courseStatisticsTableItemCount = 0, 
-	/*categoryStatisticsTableItemCount = 0, 
-	categoryStatisticsCompareTableItemCount = 0, 
-	categoryStatisticsSelectItemCount = 0, */
 
 	started = 0, 
 
 	init = function() {
-		/*$("#facultySelect").selectpicker();
-		$("#instituteSelect").selectpicker(); 
-		$("#courseOfStudiesSelect").selectpicker(); */
-
 		$("#loginStatisticsMoreButton").on('click', onLoginStatisticsMoreButtonClick); 
 		$("#accessStatisticsMoreButton").on('click', onAccessStatisticsMoreButtonClick); 
 		$("#courseStatisticsMoreButton").on('click', onCourseStatisticsMoreButtonClick); 
@@ -35,7 +28,6 @@ StatisticsModule.StatisticsView = (function() {
 		$("#lineChartButton").on('click', onLineChartButtonClick); 
 		$("#barChartButton").on('click', onBarChartButtonClick); 
 		
-		//initCategoryStatisticsChart(); 
 		return that; 
 	}, 
 
@@ -177,105 +169,6 @@ StatisticsModule.StatisticsView = (function() {
 		window.focus();
 	},
 
-	/*addTagCloud = function(object) {
-		var words = [];
-		for (var key in object) {
-			var faculty = object[key];
-			var text = faculty["name"];
-			var weight = faculty["courses"];
-			var color = faculty["color"];
-			var materials = faculty["materials"];
-			var subscriber = faculty["subscriber"];
-			var trainer = faculty["trainer"];
-			var word = {};
-			word['text'] = text;
-			word['weight'] = weight;
-			word['color'] = color;
-			word['materials'] = materials;
-			word['subscriber'] = subscriber;
-			word['trainer'] = trainer;
-			words.push(word); 
-		}
-		$("#categoryStatsTab").on("click", {"words": words}, onCategoryStatsTabClick);
-		//initCloud(words); 
-	}, 
-
-	onCategoryStatsTabClick = function(event) {
-		initCloud(event.data.words);
-	}, 
-
-	initCloud = function(words) {
-
-		$("#tagcloud").jQCloud(words, {
-	      	autoResize: true, 
-	      	removeOverflowing: false, 
-	      	fontSize: {
-		    	from: 0.06,
-		    	to: 0.02
-		  	}
-	    });
-
-		setTimeout(function () {
-		    var obj = $("#tagcloud").data("jqcloud");
-		    var data = obj.word_array;
-		    for (var i in data) {
-		    	var text = data[i]["text"];
-		    	var color = data[i]["color"];
-		        $("#" + data[i]["attr"]["id"]).css("color", color);
-		        $("#facultySelect").append("<option>" + text + "</option>");
-		        $("#facultySelect").val("-").selectpicker('refresh');
-		        //addCategoryListItem(color, text);
-		        //addCourseOfStudiesListItem("test", text);
-		    }
-		}, 100);
-		$("#categoryStatisticsModal").on('shown.bs.modal', {'words': words}, onCategoryStatisticsModalShow); 
-	}, 
-
-	drawPieChart = function(words) {
-		var data = [], chart_labels = [], chart_series_colors = [];
-		var weightSum = 0; 
-		for (var i = 0; i < words.length; i++) {
-			var word = words[i];
-			var weight = word["weight"];
-			var text = word["text"];
-			var color = word["color"];
-			var materials = word["materials"];
-			var subscriber = word["subscriber"];
-			var trainer = word["trainer"];
-			weightSum += parseInt(weight);
-			data.push(weight);
-			chart_labels.push(text);
-			chart_series_colors.push(color);
-			addCategoryStatisticsTableItem(text, weight, materials, subscriber, trainer); 
-		}
-		for (var i = 0; i < data.length; i++) {
-			data[i] = (parseInt(data[i])/weightSum) *100;
-		}
-	
-		var coursePie = $.jqplot ('coursePie', [data], 
-	    { 
-	        seriesDefaults: {
-	            renderer: jQuery.jqplot.PieRenderer, 
-	            rendererOptions: {
-	                //dataLabels: chart_labels, 
-	                showDataLabels: true
-	            }
-	        }, 
-	        legend: {
-	            show:true,
-	            location: 'e',
-	            labels: chart_labels
-	        },
-	        highlighter: {
-			    show: true,
-			    useAxesFormatters: false, // must be false for piechart   
-			    tooltipLocation: 'w',
-			    formatString:'%s, %P',
-			},
-	        seriesColors: chart_series_colors
-	    });
-	}, */
-
 	initDatePicker = function(min, max) {
 		$('.date-picker').datepicker( {
 			showOn: "button",
@@ -350,7 +243,6 @@ StatisticsModule.StatisticsView = (function() {
     		$("#startDate").datepicker("refresh");
     		$("#endDate").datepicker("setDate", new Date(endYear + "/" + endMonth));
     		$("#endDate").datepicker("refresh");
-    		console.log(started); 
     		if(started != 0) {
     			changeZoomDates(loginStatisticsChart);
 				changeZoomDates(accessStatisticsChart); 
@@ -427,70 +319,6 @@ StatisticsModule.StatisticsView = (function() {
 		});
 		accessStatisticsTableItemCount++;
 	}, 
-
-
-	/*makeCategoryStatisticsTableItem = function(options) {
-		var item = StatisticsModule.CategoryStatisticsTableItem().init({
-			id: options.id,
-			category: options.category,
-			courseCount: options.courseCount,
-			materialsCount: options.materialsCount, 
-			subscriberCount: options.subscriberCount, 
-			trainerCount: options.trainerCount
-		}); 
-		var $el = item.render(); 
-		$("#categoryStatisticsTableItemContainer").append($el); 
-	}, 
-
-	addCategoryStatisticsTableItem = function(category, courseCount, materialsCount, subscriberCount, trainerCount) {
-		makeCategoryStatisticsTableItem({
-			id: "categoryStatisticsTableItem" + categoryStatisticsTableItemCount, 
-			category: category,
-			courseCount: courseCount, 
-			materialsCount: materialsCount, 
-			subscriberCount: subscriberCount, 
-			trainerCount: trainerCount
-		});
-		categoryStatisticsTableItemCount++;
-	},
-
-	makeCategoryStatisticsCompareTableItem = function(options) {
-		var item = StatisticsModule.CategoryStatisticsCompareTableItem().init({
-			id: options.id, 
-			title: options.title, 
-			trainerCount: options.trainerCount, 
-			subscriberCount: options.subscriberCount
-		}); 
-		var $el = item.render(); 
-		$("#categoryStatisticsSelectCompareTableItemContainer").append($el); 
-	}, 
-
-	addCategoryStatisticsCompareTableItem = function(title, trainerCount, subscriberCount) {
-		makeCategoryStatisticsCompareTableItem({
-			id: "categoryStatisticsCompareTableItem" + categoryStatisticsCompareTableItemCount, 
-			title: title, 
-			trainerCount: trainerCount, 
-			subscriberCount: subscriberCount
-		});
-		categoryStatisticsCompareTableItemCount++;
-	},
-
-	makeCategoryStatisticsSelectItem = function(options) {
-		var item = StatisticsModule.CategoryStatisticsSelectItem().init({
-			id: options.id
-		}); 
-		var $el = item.render(); 
-		$("#categoryStatisticsSelectItemContainer").append($el); 
-	}, 
-
-	addCategoryStatisticsSelectItem = function() {
-		makeCategoryStatisticsSelectItem({
-			id: "categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount
-		});
-		categoryStatisticsSelectItemCount++;
-	},*/
-
-	
 
 	initCategoryStatisticsChart = function() {
 			var chartData = generateChartData();
@@ -574,7 +402,6 @@ function generateChartData() {
             views: views
         });
     }
-    console.log(chartData); 
     return chartData;
 }
 

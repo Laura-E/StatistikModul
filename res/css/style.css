@@ -71,6 +71,11 @@ body {
 	clear: both;
 }
 
+.ui-datepicker-title select {
+	line-height: 1.2em;
+	background-position: 90%;
+}
+
 .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
 	background-image: none;
 	background-color: teal;

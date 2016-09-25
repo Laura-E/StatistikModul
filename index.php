@@ -18,7 +18,6 @@
 	</head>
 
 	<body>
-
     <iframe id="ifmcontentstoprint" class="printable" style="height: 0px; width: 0px; position: absolute"></iframe>
     
     <div class="modal fade" id="chartEnlargementModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -152,7 +151,7 @@
         <div id="calculatingResults">calculating results...</div>
     </div>
 
-    <?php         
+    <?php       
         require_once('../config.php');
         global $PAGE;
         global $OUTPUT;
@@ -199,6 +198,7 @@
                         </div>
                     </div>
                     <br />
+                    <!--<div id="categoriesChart"></div>-->
                     <div class="row" id="numbers">
                         <div class="col-md-4">
                             <div class="title box"><div>Zugriffe</div><br /><div class="number" id="readWriteCount"></div></div>
@@ -259,14 +259,21 @@
                             <div class="title box"><div>Dozenten</div><br /><div class="number" id="categoryTrainerCount"></div></div>
                         </div>
                     </div>
-                    <br />
+                    <br class="clear" />
+
+                    <div id="categoriesSubscriberChart"></div>
+                    <br class="clear" />
+                    <div id="categoriesTrainerChart"></div>
+                    <br class="clear" />
+                    <div id="categoriesMaterialsChart"></div>
 
                     <table class="table table-bordered" id="categoryStatisticsCompareTable">
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Dozenten</th>
                                 <th>Teilnehmer</th>
+                                <th>Dozenten</th>
+                                <th>Materialien</th>
                         </thead>
                         <tbody id="categoryStatisticsCompareTableItemContainer">
                             
@@ -274,7 +281,7 @@
                     </table>
 
                     <div class="box" id="inactiveCoursesAndUsersBox">
-                        <div class="title">Inaktive</div>
+                        <div class="title">Inaktive Kurse und Nutzer</div>
                         <select id="inactivityKindSelect">
                             <option>Kurse</option>
                             <option>Nutzer</option>
@@ -291,35 +298,6 @@
                         <button type="button" class="btn btn-primary" id="searchInactiveUsersButton">Suchen</button>
                         <br class="clear" />
                         <div id="inactiveCoursesAndUsersTableContainer"></div>
-                        <!--<table class="table table-bordered" id="inactiveUsersTable">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Vorname</th>
-                                    <th>Nachname</th>
-                                    <th>Email</th>
-                                    <th>Letztes Login</th>
-                                </tr>
-                            </thead>
-                            <br class="clear" />
-                            <tbody id="inactiveUsersTableItemContainer">
-
-                            </tbody>
-                        </table>
-
-                        <table class="table table-bordered" id="inactiveCoursesTable">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Titel</th>
-                                    <th>Letzte Aktivität</th>
-                                </tr>
-                            </thead>
-                            <br class="clear" />
-                            <tbody id="inactiveCoursesTableItemContainer">
-
-                            </tbody>
-                        </table>-->
                     </div>
                     <div class="col-md-12 text-center">
                         <ul class="pagination pagination-lg pager" id="myPager"></ul>
@@ -341,10 +319,7 @@
         
 
         ?>
-
-        <script type="text/html" id="categoryStatisticsSelectItem-tpl">
-            <div id="<%= id %>">
-                <select id="facultySelect">
+<!--<select id="facultySelect">
                     <option>-</option>
                 </select><br />
                 <select id="instituteSelect">
@@ -352,7 +327,12 @@
                 </select><br />
                 <select id="courseOfStudiesSelect">
                     <option>-</option>
-                </select>
+                </select>-->
+
+
+        <script type="text/html" id="categoryStatisticsSelectItem-tpl">
+            <div id="<%= id %>">
+                
             </div>
             <hr class="selectSeparator" />
         </script>
@@ -397,8 +377,9 @@
         <script type="text/html" id="categoryStatisticsCompareTableItem-tpl">
             <tr id="<%= id %>">
                 <td><%= title %></td>
-                <td><%= trainerCount %></td>
                 <td><%= subscriberCount %></td>
+                <td><%= trainerCount %></td>
+                <td><%= materialsCount %></td>
             </tr>
         </script>
 
@@ -504,6 +485,7 @@
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pointLabels.js"></script>
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pieRenderer.js"></script>
         <script type="text/javascript" src="libs/jQCloud/dist/jqcloud.js"></script>
+        <!--<script type="text/javascript" src="https://mistic100.github.io/jQCloud/dist/jqcloud2/dist/jqcloud.js"></script>-->
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/amcharts.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/serial.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/themes/light.js"></script>

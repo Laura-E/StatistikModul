@@ -5,17 +5,25 @@ StatisticsModule.MainModel = (function() {
 
 	init = function() {
 		$(this).scrollTop(0);
-		$("#loadingOverlay").width($("body").width());
-		$("#loadingOverlay").height($("body").height());
+		adaptLoadingOverlay(); 
+
+		$(window).resize(function() {
+		  	adaptLoadingOverlay();
+		});
+
 		initSpinner(); 
 		startSpinner();
-		//getInactiveCoursesAndUsers(); 
 		getMinAndMaxDate(); 
 		getLoginStatistics();
 		getReadWriteData();  
 		getCourseData(); 
 		getCategoryData();
 		return that; 
+	}, 
+
+	adaptLoadingOverlay = function() {
+		$("#loadingOverlay").width($("body").width());
+		$("#loadingOverlay").height($("body").height());
 	}, 
 
 	initSpinner = function() {
@@ -67,7 +75,6 @@ StatisticsModule.MainModel = (function() {
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
-			console.log(object); 
 			$(that).trigger('initTimePeriod', object);
 		});
 	}, 
@@ -77,21 +84,18 @@ StatisticsModule.MainModel = (function() {
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
-			console.log(object); 
 			$(that).trigger('addTagCloud', object);
 			stopSpinner(); 
 		}); 
 	}, 
 
 	getInactiveCoursesAndUsers = function(kind, count, dateType) {
-		console.log(kind, count, dateType); 
 		startSpinner();
 		if (kind == "Kurse") {
 			$.ajax({url: "src/php/functions.php?command=getInactiveCourses", data: {count: count, dateType: dateType}}).done(
 			function(data) {
 				var json = data; 
 				var object = jQuery.parseJSON(json); 
-				console.log(object); 
 				$(that).trigger('showInactiveCourses', object);
 				stopSpinner();
 			});
@@ -100,7 +104,6 @@ StatisticsModule.MainModel = (function() {
 			function(data) {
 				var json = data; 
 				var object = jQuery.parseJSON(json); 
-				//console.log(object); 
 				$(that).trigger('showInactiveCoursesAndUsers', object);
 				stopSpinner();
 			});
@@ -121,7 +124,6 @@ StatisticsModule.MainModel = (function() {
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
-			console.log(object); 
 			$(that).trigger('drawChart', [object, "readWrite"]);
 		}); 
 	}, 
@@ -131,18 +133,15 @@ StatisticsModule.MainModel = (function() {
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
-			console.log(object); 
 			$(that).trigger('drawChart', [object, "course"]);
 		});
 	}, 
 
 	getCounts = function(start, end) {
-		console.log(start, end); 
 		$.ajax({url: "src/php/functions.php?command=getCounts", data: {start: start, end: end}}).done(
 		function(data) {
 			var json = data; 
 			var object = jQuery.parseJSON(json); 
-			console.log(object); 
 			$(that).trigger('changeCountValues', [object]);
 		});
 	}; 
