@@ -11,7 +11,6 @@
             <link rel="stylesheet" href="libs/jquery-ui-1.11.4.custom/jquery-ui.css">
             <link rel="stylesheet" href="libs/jQRangeSlider-master/css/iThing.css" type="text/css" />
             <link rel="stylesheet" href="libs/DataTables-1.10.12/media/css/jquery.dataTables.min.css" />
-            <!--<link rel="stylesheet" href="libs/simplePagination/css/style.css">-->
 		    <link rel="stylesheet" href="res/css/style.css" id="stylesheet">
             <link rel="stylesheet" type="text/css" href="res/css/print.css" media="print">  
 
@@ -152,7 +151,7 @@
     </div>
 
     <?php       
-        require_once('../config.php');
+        require_once('../../../config.php');
         global $PAGE;
         global $OUTPUT;
         require_login(0, false);
@@ -232,18 +231,9 @@
 
 
                     <div class="box" id="categoryStatisticsOptionsBox">
-                        <div class="title">OPTIONEN<span id="categoryStatisticsOptionsAddButton" class="zmdi zmdi-plus zmdi-hc-lg"></span></div>
+                        <div class="title">OPTIONEN<!--<span id="categoryStatisticsOptionsAddButton" class="zmdi zmdi-plus zmdi-hc-lg"></span>--></div>
 
                         <div id="categoryStatisticsSelectItemContainer">
-                            <!--<select class="selectpicker" id="facultySelect" data-live-search="true">
-                                <option>-</option>
-                            </select><br />
-                            <select class="selectpicker" id="instituteSelect">
-                                <option>-</option>
-                            </select><br />
-                            <select class="selectpicker" id="courseOfStudiesSelect">
-                                <option>-</p>
-                            </select><br />-->
                         </div>
                         <a id="a" href="#"></a>
                     </div>
@@ -302,15 +292,13 @@
                     <div class="col-md-12 text-center">
                         <ul class="pagination pagination-lg pager" id="myPager"></ul>
                     </div>
-                    <!--<div class="panel-group" id="accordion"></div>-->
-                    <!--<div id="categoryStatisticsChart"></div>-->
                 </div>
             </div>
 
         </div>
 
         <?php         
-        require_once('../config.php');
+        require_once('../../../config.php');
         global $PAGE;
         global $OUTPUT;
 
@@ -455,7 +443,6 @@
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pointLabels.js"></script>
         <script type="text/javascript" src="libs/jquery.jqplot.1.0.9/plugins/jqplot.pieRenderer.js"></script>
         <script type="text/javascript" src="libs/jQCloud/dist/jqcloud.js"></script>
-        <!--<script type="text/javascript" src="https://mistic100.github.io/jQCloud/dist/jqcloud2/dist/jqcloud.js"></script>-->
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/amcharts.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/serial.js"></script>
         <script type="text/javascript" src="libs/amcharts_3.20.9/amcharts/themes/light.js"></script>
@@ -481,7 +468,7 @@
         </script>
 
         <?php         
-        require_once('../config.php');
+        require_once('../../../config.php');
         global $OUTPUT;
 
         echo $OUTPUT->footer();

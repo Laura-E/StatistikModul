@@ -7,16 +7,13 @@ StatisticsModule.CategoryStatisticsView = (function() {
 
 	init = function() {
 		addCategoryStatisticsSelectItem(); 
-		$("#categoryStatisticsOptionsAddButton").on('click', onCategoryStatisticsOptionsAddButtonClick); 
+		//$("#categoryStatisticsOptionsAddButton").on('click', onCategoryStatisticsOptionsAddButtonClick); 
 		$("#searchInactiveUsersButton").on('click', onSearchInactiveUsersButtonClick); 
 
 
 		return that; 
 	}, 
 
-	/*
-	plotting a chart with horizontal bars
-	*/
 	initCategoryPlot = function(plot, chartData, title) {
 		setTimeout(function () {
 			plot1 = $.jqplot(plot, [chartData], {
@@ -52,9 +49,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		
 	}, 
 
-	/*
-	triggers the search for inactive users on button clicked
-	*/
 	onSearchInactiveUsersButtonClick = function(event) {
 		var kind = $("#inactivityKindSelect").val(); 
 		var count = $("#inactiveUsersPeriodSelect").val(); 
@@ -63,18 +57,11 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$(that).trigger("getInactiveCoursesAndUsers", [kind, count, dateType]);
 	}, 
 
-	/*
-	momentarily unused methode; additionally if more categories should be compared
-	*/
 	onCategoryStatisticsOptionsAddButtonClick = function(event) {
 		$(".selectSeparator:last").show(); 
 		addCategoryStatisticsSelectItem(); 
 	}, 
 
-	/*
-	generates a tag cloud;
-	is given a json object
-	*/
 	addTagCloud = function(object) {
 		categoryData = object;
 		var words = [];
@@ -104,16 +91,10 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatsTab").on("click", {"words": words}, onCategoryStatsTabClick);
 	}, 
 
-	/*
-	needs to call the method seperatily to be loaded on tab click
-	*/
 	onCategoryStatsTabClick = function(event) {
 		initCloud(event.data.words);
 	}, 
 
-	/*
-	initializes the tag cloud 
-	*/
 	initCloud = function(words) {
 		$("#tagcloud").jQCloud(words, {
 	      	autoResize: true, 
@@ -132,15 +113,10 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatisticsModal").on('shown.bs.modal', {'words': words}, onCategoryStatisticsModalShow); 
 	},  
 
-	/*
-	handles event and draw pie chart when more button is clicked*/
 	onCategoryStatisticsModalShow = function(event) {
 		drawPieChart(event.data.words);
 	},
 
-	/*
-	initializes the view of the inactive users; not the courses!!
-	*/
 	showInactiveCoursesAndUsers = function(inactiveUsers) {
 		$("#inactiveCoursesAndUsersTableContainer").empty(); 
 		addInactiveUsersTable(); 
@@ -166,9 +142,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		  }); 
 	}, 
 
-	/*
-	views the inactive courses
-	*/
 	showInactiveCourses = function(inactiveCourses) {
 		$("#inactiveCoursesAndUsersTableContainer").empty(); 
 		addInactiveCoursesTable(); 
@@ -199,9 +172,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		  }); 
 	}, 
 
-	/*
-	initializes the pie chart
-	*/
 	drawPieChart = function(words) {
 		var data = [], chart_labels = [], chart_series_colors = [];
 		var weightSum = 0; 
@@ -247,9 +217,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	    });
 	}, 
 
-	/*
-	sets up the table rows underneath the dropdown menu for selecting the categories
-	*/
 	makeCategoryStatisticsTableItem = function(options) {
 		var item = StatisticsModule.CategoryStatisticsTableItem().init({
 			id: options.id,
@@ -263,9 +230,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatisticsTableItemContainer").append($el); 
 	}, 
 
-	/*
-	adds the rows to the table
-	*/
 	addCategoryStatisticsTableItem = function(category, courseCount, materialsCount, subscriberCount, trainerCount) {
 		makeCategoryStatisticsTableItem({
 			id: "categoryStatisticsTableItem" + categoryStatisticsTableItemCount, 
@@ -278,8 +242,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		categoryStatisticsTableItemCount++;
 	},
 
-	/*
-	initializes the inactive user table, and added to the container*/
 	makeInactiveUsersTable = function(options) {
 		var item = StatisticsModule.InactiveUsersTable().init({
 			id: options.id
@@ -288,16 +250,12 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#inactiveCoursesAndUsersTableContainer").append($el); 
 	}, 
 
-	/*
-	adds the whole inactive user table*/
 	addInactiveUsersTable = function() {
 		makeInactiveUsersTable({
 			id: "inactiveUsersTable"
 		});
 	},
 
-	/*
-	initializes the inactive courses table, added to the container*/
 	makeInactiveCoursesTable = function(options) {
 		var item = StatisticsModule.InactiveCoursesTable().init({
 			id: options.id
@@ -306,18 +264,12 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#inactiveCoursesAndUsersTableContainer").append($el); 
 	}, 
 
-	/*
-	adds the whole inactive courses table
-	*/
 	addInactiveCoursesTable = function() {
 		makeInactiveCoursesTable({
 			id: "inactiveCoursesTable"
 		});
 	},
 
-	/*
-	initializes a row of the inactive users table
-	*/
 	makeInactiveUsersTableItem = function(options) {
 		var item = StatisticsModule.InactiveUsersTableItem().init({
 			id: options.id,
@@ -331,9 +283,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#inactiveUsersTableItemContainer").append($el); 
 	}, 
 
-	/*
-	adds an item of the inactive user table
-	*/
 	addInactiveUsersTableItem = function(id, firstname, lastname, email, lastlogin) {
 		makeInactiveUsersTableItem({
 			id: "inactiveUsersTableItem" + id, 
@@ -345,8 +294,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		});
 	},
 
-	/*
-	initializes an item of the inactive courses table*/
 	makeInactiveCoursesTableItem = function(options) {
 		var item = StatisticsModule.InactiveCoursesTableItem().init({
 			id: options.id,
@@ -358,9 +305,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#inactiveCoursesTableItemContainer").append($el); 
 	}, 
 
-	/*
-	adds an item of the inactive courses table
-	*/
 	addInactiveCoursesTableItem = function(id, name, lastActivity) {
 		makeInactiveCoursesTableItem({
 			id: "inactiveCoursesTableItem" + id, 
@@ -370,9 +314,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		});
 	},
 
-	/*
-	initializes a row of the table beneath the category selection
-	*/
 	makeCategoryStatisticsCompareTableItem = function(options) {
 		var item = StatisticsModule.CategoryStatisticsCompareTableItem().init({
 			id: options.id, 
@@ -385,9 +326,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatisticsCompareTableItemContainer").append($el); 
 	}, 
 
-	/*
-	adds a row to the table beneath the category selection
-	*/
 	addCategoryStatisticsCompareTableItem = function(title, trainerCount, subscriberCount, materialsCount) {
 		makeCategoryStatisticsCompareTableItem({
 			id: "categoryStatisticsCompareTableItem" + categoryStatisticsCompareTableItemCount, 
@@ -399,9 +337,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		categoryStatisticsCompareTableItemCount++;
 	},
 
-	/*
-	initialices the drop down items for the category selection
-	*/
 	makeCategoryStatisticsSelectItem = function(options) {
 		var item = StatisticsModule.CategoryStatisticsSelectItem().init({
 			id: options.id
@@ -410,10 +345,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		$("#categoryStatisticsSelectItemContainer").append($el); 
 	}, 
 
-
-	/*
-	gets the under-categories of the selected category in the drop down menu
-	*/
 	getData = function() {
 		var data = categoryData["all"]; 
 		var allSelects = $("#categoryStatisticsSelectItem0 select"); 
@@ -440,9 +371,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		return data; 
 	}, 
 
-	/*
-	clears the existing charts when a new category, or a under-category is selected and adds new charts
-	*/
 	addCategorySelectItem = function(level) {
 		var data = getData(); 
 		$("#categoryStatisticsCompareTable").show(); 
@@ -520,9 +448,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		});*/
 	},
 
-	/*
-	adds a value to the given chartData; neglectes the values if they're zero, NaN or undefined
-	*/
 	addPlotValue = function(chartData, name, value) {
 		var chartDataOne = [];
 		if (!isNaN(value) && value != 0) {
@@ -533,9 +458,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		return chartData; 
 	},
 	
-	/*
-	Unused
-	*/
 	dynamicSort = function(property) {
 	    var sortOrder = 1;
 	    if(property[0] === "-") {
@@ -548,9 +470,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	    }
 	}, 
 
-	/*
-	adds a new dropdown menu, when the category selection has changed or the parent category was selected new.
-	*/
 	addCategoryStatisticsSelectItem = function() {
 		makeCategoryStatisticsSelectItem({
 			id: "categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount

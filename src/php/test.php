@@ -1,6 +1,6 @@
 <?php 
 
-    require_once('../../../config.php');
+    require_once('../../../../../config.php');
     //getCounts("1277935200", "1343772000"); 
     //getCategoryData(); 
     echo json_encode(getCategories(0));

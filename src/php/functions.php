@@ -1,5 +1,5 @@
 <?php 
-    require_once('../../../config.php');
+    require_once('../../../../../config.php');
 
     switch($_GET['command']) {
         case 'getMinAndMaxDate':

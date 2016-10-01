@@ -21,17 +21,11 @@ StatisticsModule.MainModel = (function() {
 		return that; 
 	}, 
 
-	/*
-	adapt the size of the loading spinner overlay
-	*/
 	adaptLoadingOverlay = function() {
 		$("#loadingOverlay").width($("body").width());
 		$("#loadingOverlay").height($("body").height());
 	}, 
 
-	/*
-	initializes the loading spinner
-	*/
 	initSpinner = function() {
 		var opts = {
 		  lines: 13 // The number of lines to draw
@@ -61,18 +55,12 @@ StatisticsModule.MainModel = (function() {
 		spinner.stop(); 
 	}, 
 
-	/*
-	stops the loading spinner
-	*/
 	stopSpinner = function() {
 		$("body").css("overflow-y", "visible");
 		$("#loadingOverlay").hide(); 
 	    spinner.stop(); 
 	}, 
 
-	/*
-	starts the loading spinner
-	*/
 	startSpinner = function() {
 		$('html, body').animate({
 	        scrollTop: $("body").offset().top
@@ -82,8 +70,6 @@ StatisticsModule.MainModel = (function() {
 		spinner.spin(spinnerOverlay);
 	}, 
 
-	/*
-	gets the min and max values of the database for the time slider*/
 	getMinAndMaxDate = function() {
 		$.get("src/php/functions.php?command=getMinAndMaxDate").done(
 		function(data) {
@@ -93,9 +79,6 @@ StatisticsModule.MainModel = (function() {
 		});
 	}, 
 
-	/*
-	gets all categories 
-	*/
 	getCategoryData = function() {
 		$.get("src/php/functions.php?command=getCategoryData").done(
 		function(data) {
@@ -106,9 +89,6 @@ StatisticsModule.MainModel = (function() {
 		}); 
 	}, 
 
-	/*
-	gets all inactive courses or users
-	*/
 	getInactiveCoursesAndUsers = function(kind, count, dateType) {
 		startSpinner();
 		if (kind == "Kurse") {
@@ -130,9 +110,6 @@ StatisticsModule.MainModel = (function() {
 		} 
 	}, 
 
-	/*
-	gets data for login statistic chart
-	*/
 	getLoginStatistics = function() {
 		$.get("src/php/functions.php?command=getLoginCount").done(
 		function(data) {
@@ -142,9 +119,6 @@ StatisticsModule.MainModel = (function() {
 		}); 
 	}, 
 
-	/*
-	gets data for readWrite chart
-	*/
 	getReadWriteData = function() {
 		$.get("src/php/functions.php?command=getReadWriteData").done(
 		function(data) {
@@ -154,9 +128,6 @@ StatisticsModule.MainModel = (function() {
 		}); 
 	}, 
 
-	/*
-	gets data for the course statisitc chart
-	*/
 	getCourseData = function() {
 		$.get("src/php/functions.php?command=getCourseData").done(
 		function(data) {
@@ -166,9 +137,6 @@ StatisticsModule.MainModel = (function() {
 		});
 	}, 
 
-	/*
-	gets counts for given time period
-	*/
 	getCounts = function(start, end) {
 		$.ajax({url: "src/php/functions.php?command=getCounts", data: {start: start, end: end}}).done(
 		function(data) {
