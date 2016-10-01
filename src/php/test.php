@@ -3,7 +3,7 @@
     require_once('../../../config.php');
     //getCounts("1277935200", "1343772000"); 
     //getCategoryData(); 
-    getCategories();
+    echo json_encode(getCategories(0));
     //getInactiveUsers(); 
     //getInactiveCourses(); 
     //getInactiveCoursesAndUsers(); 
@@ -19,7 +19,24 @@
         return $value;
     } 
 
-    function getCategories() {
+    function getCategories($topcategory) {
+        global $DB;
+        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+        $categories = $DB->get_records_sql($sql);
+        foreach ($categories as $key=>$value) {
+            $subcategory = getCategories($key);
+            if (sizeof($subcategory) != 0) {
+                $categories[$key]->subcategory = $subcategory; 
+            } else {
+                $courses_sql = "SELECT id, fullname FROM mdl_course WHERE category = $topcategory";
+                $courses = $DB->get_records_sql($courses_sql);
+                $categories[$key]->courses = $courses; 
+            }
+        }
+        return $categories; 
+    }
+
+    /*function getCategories() {
         global $DB;
         $topcategory = 0; 
         //$courseids = getCourseIds($courses, $topcategory, $parents); 
@@ -45,7 +62,7 @@
             $faculties[$key]->subcategory = $institutes;
         }
         echo json_encode($faculties); 
-    }
+    }*/
 
     function addAllToValue($categories) {
         //echo json_encode($categories);

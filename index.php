@@ -319,15 +319,6 @@
         
 
         ?>
-<!--<select id="facultySelect">
-                    <option>-</option>
-                </select><br />
-                <select id="instituteSelect">
-                    <option>-</option>
-                </select><br />
-                <select id="courseOfStudiesSelect">
-                    <option>-</option>
-                </select>-->
 
 
         <script type="text/html" id="categoryStatisticsSelectItem-tpl">
@@ -434,27 +425,6 @@
                 <td><%= lastActivity %></td>
             </tr>
         </script>
-
-        <!--<script type="text/html" id="categoryListItem-tpl">
-            <div class="panel panel-default" id="<%= id %>">
-                <a href="#<%= collapseId %>" class="panel-heading" data-toggle="collapse" data-parent="#accordion">
-                    <div class="panel-title">
-                        <div class="colorStripe" style="background-color:<%= backgroundColor %>;"></div>
-                        <p class="categoryTitle"><%= title %></p>
-                    </div>
-                </a>
-                <div id="<%= collapseId %>" class="panel-collapse collapse courseOfStudiesCollapse">
-                    <ul class="list-group courseOfStudiesList" id="collectionUl">
-                    </ul>
-                </div>
-            </div>
-        </script>
-
-        <script type="text/html" id="courseOfStudiesListItem-tpl">
-            <li class="list-group-item" id="<%= id %>" tabindex="1">
-                <span class="courseOfStudiesTitle"><%= title %></span> 
-            </li>
-        </script>-->
 
         <script type="text/javascript" src="libs/jquery-2.1.4.js"></script>
         <script type="text/javascript" src="libs/underscore.js"></script>

@@ -218,7 +218,7 @@
         $categories = $DB->get_records_sql($sql);
 
         $statsdata = array();
-        $allCategoriesArray = getCategories($courses, $parents);
+        $allCategoriesArray = getCategories(0, $courses, $parents);
         $courseidsstr = array();
         foreach ($courseids as $maincategory => $courseid) {
             $courseidstr[$maincategory] = "(".implode(",", $courseid).")";
@@ -265,7 +265,26 @@
     
     }
 
-    function getCategories($courses, $parents) {
+    function getCategories($topcategory, $courses, $parents) {
+        global $DB;
+        $courseids = getCourseIds($courses, $topcategory, $parents); 
+        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+        $categories = $DB->get_records_sql($sql);
+        $categories = addAllToValue($categories, $courseids); 
+        foreach ($categories as $key=>$value) {
+            $subcategory = getCategories($key, $courses, $parents);
+            if (sizeof($subcategory) != 0) {
+                $categories[$key]->subcategory = $subcategory; 
+            } /*else {
+                $courses_sql = "SELECT id, fullname FROM mdl_course WHERE category = $topcategory";
+                $courses = $DB->get_records_sql($courses_sql);
+                $categories[$key]->courses = $courses; 
+            }*/
+        }
+        return $categories; 
+    }
+
+    /*function getCategories($courses, $parents) {
         global $DB;
         $topcategory = 0; 
         $courseids = getCourseIds($courses, $topcategory, $parents); 
@@ -293,7 +312,7 @@
             $faculties[$key]->subcategory = $institutes;
         }
         return $faculties; 
-    }
+    }*/
 
     function addAllToValue($categories, $courseids) {
         $array = array(); 
