@@ -1,6 +1,6 @@
 <?php 
     require_once('../../../../../config.php');
-
+    $courseIDs = [];
     switch($_GET['command']) {
         case 'getMinAndMaxDate':
             getMinAndMaxDate(); 
@@ -32,18 +32,17 @@
             $dateType = $_GET['dateType']; 
             getInactiveCourses($count, $dateType); 
             break; 
+        case 'getCategoriesForParent': 
+            $topcategory = $_GET['topcategory'];
+            getCategoriesForParent($topcategory); 
+            break;
         default: 
             return; 
     }
 
-   /* function getInactiveCoursesAndUsers($count, $dateType) {
-        //$inactiveCoursesAndUsers = array(); 
-        //$inactiveCoursesAndUsers["inactiveCourses"] = getInactiveCourses($count, $dateType); 
-        //$inactiveCoursesAndUsers["inactiveUsers"] = getInactiveUsers($count, $dateType); 
-        $inactiveCoursesAndUsers = getInactiveUsers($count, $dateType); 
-        echo json_encode($inactiveCoursesAndUsers);
-    }*/
-
+    /*
+    gets the inactive users, who have been inactive for a specific time period
+    */
     function getInactiveUsers($count, $dateType) {
         global $DB;
         $time = strtotime("-".$count." ".$dateType, time());
@@ -52,18 +51,22 @@
         echo json_encode($result);
     }
 
+    /*
+    gets the inactive courses, who haven`t been used since a specific time period
+    */
     function getInactiveCourses($count, $dateType) {
         global $DB;
         $time = strtotime("-".$count." ".$dateType, time());
         $sql = "SELECT stats.id, stats.courseid, c.fullname, max(stats.timeend) AS maxtimeend, DATE_FORMAT(FROM_UNIXTIME(max(timeend)), '%d.%m.%Y') AS 'date_formatted' FROM mdl_stats_user_monthly AS stats, mdl_course AS c WHERE stats.courseid = c.id AND stats.timeend < $time GROUP BY courseid";
-        //$sql = "SELECT id, category, fullname, DATE_FORMAT(FROM_UNIXTIME(timemodified), '%d.%m.%Y') AS 'date_formatted' FROM mdl_course  WHERE timemodified < $time ORDER BY timemodified";
         $result = $DB->get_records_sql($sql);
         echo json_encode($result);
     }
 
+    /*
+    gets the minimum and the maximum date from the database
+    */
     function getMinAndMaxDate() {
         global $DB;
-        //SELECT DATE_FORMAT(FROM_UNIXTIME(min(timeend)), '%m.%Y') AS min, DATE_FORMAT(FROM_UNIXTIME(max(timeend)), '%m.%Y') AS max
         $sql = "SELECT min(timeend) AS min, max(timeend) AS max
                 FROM `mdl_stats_monthly`";
 
@@ -71,6 +74,9 @@
         echo json_encode($statsdata);
     }
 
+    /*
+    gets the coursedata
+    */
     function getCourseData() {
         global $DB;
         $sql = "SELECT sm2.timeend as timeend, DATE_FORMAT(FROM_UNIXTIME(timeend), '%m.%Y') AS 'date_formatted',
@@ -83,6 +89,9 @@
         echo json_encode($statsdata);
     }
 
+    /*
+    gets logincount, readwritecount and coursecount for a specific timeperiod
+    */
     function getCounts($start, $end) {
         global $DB;
         $counts = array();
@@ -218,7 +227,6 @@
         $categories = $DB->get_records_sql($sql);
 
         $statsdata = array();
-        $allCategoriesArray = getCategories(0, $courses, $parents);
         $courseidsstr = array();
         foreach ($courseids as $maincategory => $courseid) {
             $courseidstr[$maincategory] = "(".implode(",", $courseid).")";
@@ -236,106 +244,84 @@
                 $statsdata[$maincategory]["materials"] = getMaterialsCount($courseidstr[$maincategory]);
             }
 
-
-            /*foreach ($statsdata as $key=>$value) {
-                $topcategory = $key;
-                $sql1 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
-                $institutes = $DB->get_records_sql($sql1);
-                //$institutes = addAllToValue($institutes, $courseids); 
-                //$institutes = addToValue($key, $courseids, $value); 
-                foreach ($institutes as $key1=>$value) {
-                    $topcategory = $key1;
-                    $sql2 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
-                    $coursesOfStudies = array(); 
-                    $coursesOfStudies = $DB->get_records_sql($sql2);
-                    //$coursesOfStudies = addAllToValue($coursesOfStudies, $courseids); 
-                    //$value = addToValue($key, $courseids, $value); 
-                    $institutes[$key1]->subcategory = $coursesOfStudies; 
-                }
-                $faculties[$key]->subcategory = $institutes;
-            }*/
-
-
-
         }
-        $statsdata["courses"] = $courses; 
-        $statsdata["parents"] = $parents; 
-        $statsdata["all"] = $allCategoriesArray;
         echo json_encode($statsdata);
     
     }
 
-    function getCategories($topcategory, $courses, $parents) {
+    /*
+    gets subcategories and data (coursecount, trainercount, subscribercount, materialscount) of a specific category
+    */
+    function getCategoriesForParent($topcategory) {
         global $DB;
-        $courseids = getCourseIds($courses, $topcategory, $parents); 
+        global $courseIDs; 
+        $result;
+        $children;
+        $courseIDs = [];
+        getCourseIDs2($topcategory, true);
         $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
         $categories = $DB->get_records_sql($sql);
-        $categories = addAllToValue($categories, $courseids); 
-        foreach ($categories as $key=>$value) {
-            $subcategory = getCategories($key, $courses, $parents);
-            if (sizeof($subcategory) != 0) {
-                $categories[$key]->subcategory = $subcategory; 
-            } /*else {
-                $courses_sql = "SELECT id, fullname FROM mdl_course WHERE category = $topcategory";
-                $courses = $DB->get_records_sql($courses_sql);
-                $categories[$key]->courses = $courses; 
-            }*/
+        if(sizeof($categories) != 0) {
+            $children = $categories; 
+        } else {
+            $courses_sql = "SELECT id, fullname FROM mdl_course WHERE category = $topcategory";
+            $children = $DB->get_records_sql($courses_sql);
         }
-        return $categories; 
+        $result["children"] = addAllToValue($children); 
+
+        $courseIDs = [];
+        getCourseIDs2($topcategory, true);
+        $courseidstr = count($courseIDs) != 0 ? ("(".implode(",", $courseIDs).")") : "";
+        $result["top"] = new stdClass();
+        $result["top"]->courses = count($courseIDs); 
+        $result["top"]->trainer = getTrainerCount($courseidstr);
+        $result["top"]->subscriber = getSubscriberCount($courseidstr);
+        $result["top"]->materials = getMaterialsCount($courseidstr);
+
+        echo json_encode($result); 
     }
-
-    /*function getCategories($courses, $parents) {
-        global $DB;
-        $topcategory = 0; 
-        $courseids = getCourseIds($courses, $topcategory, $parents); 
-        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
-        $faculties = $DB->get_records_sql($sql);
-        $faculties = addAllToValue($faculties, $courseids); 
-        //$value = addToValue($key, $courseids, $value); 
-        foreach ($faculties as $key=>$value) {
-            $topcategory = $key;
-            $courseids1 = getCourseIds($courses, $topcategory, $parents); 
-            $sql1 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
-            $institutes = $DB->get_records_sql($sql1);
-            $institutes = addAllToValue($institutes, $courseids1); 
-            //$institutes = addToValue($key, $courseids, $value); 
-            foreach ($institutes as $key1=>$value) {
-                $topcategory = $key1;
-                $courseids2 = getCourseIds($courses, $topcategory, $parents); 
-                $sql2 = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
-                $coursesOfStudies = array(); 
-                $coursesOfStudies = $DB->get_records_sql($sql2);
-                $coursesOfStudies = addAllToValue($coursesOfStudies, $courseids2); 
-                //$value = addToValue($key, $courseids, $value); 
-                $institutes[$key1]->subcategory = $coursesOfStudies; 
-            }
-            $faculties[$key]->subcategory = $institutes;
-        }
-        return $faculties; 
-    }*/
-
-    function addAllToValue($categories, $courseids) {
-        $array = array(); 
+    
+    /*
+    add coursecount, trainercount, substraibercount and materialscount to object
+    */
+    function addAllToValue($categories) {
+        global $courseIDs; 
         foreach ($categories as $key=>$value) {
-
-            $courseidstr = array_key_exists($key, $courseids) ? ("(".implode(",", $courseids[$key]).")") : "";
-            /*$sql = "SELECT '$key' as category, '".count($courseids)."' as courses, ".
-                    "sum(teilnahmen) as teilnahmen, sum(kursleitungen) as kursleitungen ".
-                    "FROM mdl_tmp_stats_coursecounts ".
-                    "WHERE courseid in {$courseidstr[$key]} ";*/
-
+            $courseIDs = [];
+            getCourseIDs2($key, true);
+            $courseidstr = count($courseIDs) != 0 ? ("(".implode(",", $courseIDs).")") : "";
             if($courseidstr != "") {
-                //$categories[$key]->courses = $DB->get_records_sql($sql)["".$key]->courses;
+                $categories[$key]->courses = count($courseIDs); 
                 $categories[$key]->trainer = getTrainerCount($courseidstr);
                 $categories[$key]->subscriber = getSubscriberCount($courseidstr);
                 $categories[$key]->materials = getMaterialsCount($courseidstr);
             }
-            //$categories[$key]->courseids = $courseidstr;
-
         }
         return $categories;
     }
-    
+
+    /*
+    gets all courses in a specific category
+    */
+    function getCourseIDs2($topcategory, $start) {
+        global $DB;
+        global $courseIDs; 
+        $sql = "SELECT id, name FROM mdl_course_categories WHERE parent = $topcategory";
+        $categories = $DB->get_records_sql($sql);
+        foreach ($categories as $key=>$value) {
+            $subcategory = getCourseIDs2($key, false);
+            if (sizeof($subcategory) == 0) {
+                $courses_sql = "SELECT id, fullname FROM mdl_course WHERE category = $key";
+                $courses = $DB->get_records_sql($courses_sql);
+                foreach ($courses as $key2=>$value2) {
+                    $id = $value2->id;
+                    $fullname = $value2->fullname; 
+                    if(!in_array($id, $courseIDs)) $courseIDs[] = $id; 
+                }
+            }
+        }
+    }
+
     function getCourseIds($courses, $topcategory, $parents) {
         $courseids = array();
         foreach ($courses as $data) {
@@ -353,18 +339,15 @@
                     $categoryparents = array_merge(
                         $parents[$data->category], array($data->category));
                     $maincategory = $categoryparents[1];
-                    //echo json_encode($categoryparents); 
                 } else if (isset($parents[$data->category][1]) &&
                     $parents[$data->category][1] ==
                         $topcategory) {
                     $categoryparents = array_merge(
                         $parents[$data->category], array($data->category));
                     $maincategory = $categoryparents[1];
-                    //echo json_encode($categoryparents); 
                 }
             } else if (isset($parents[$data->category][0])) {
                 //oberste Kategorie
-                //echo json_encode($parents[$data->category]); 
                 $maincategory = $parents[$data->category][0];
             }
 
@@ -373,7 +356,6 @@
                     $courseids [$maincategory] = array();
                 }
                 $courseids[$maincategory][] = $data->courseid;
-                //echo $data->courseid . " "; 
             }
         }
         return $courseids;
@@ -406,6 +388,9 @@
         }
     }
 
+    /*
+    gets subscribercount
+    */
     function getSubscriberCount($courseids) {
         global $DB;
         $sql = "SELECT count(DISTINCT userid) as count ".
@@ -417,7 +402,9 @@
         $count = $DB->get_record_sql($sql);
         return $count->count;
     }
-
+    /*
+    gets trainercount
+    */
     function getTrainerCount($courseids) {
         global $DB;
         $sql = "SELECT count(DISTINCT userid) as count ".
@@ -430,12 +417,18 @@
         return $count->count;
     }
 
+    /*
+    gets materialscount
+    */
     function getMaterialsCount($courseids) {
         global $DB;
         $count = $DB->count_records_select('resource', "course in {$courseids}");
         return $count;
     }
 
+    /*
+    gets logincount
+    */
     function getLoginCount() {
         global $DB;
         $sql = "SELECT timeend, sum(stat1) as logins, sum(stat2) as singlelogins, (sum(stat1) + sum(stat2)) as gesamt, DATE_FORMAT(FROM_UNIXTIME(timeend), '%m.%Y') AS 'date_formatted'
@@ -446,6 +439,9 @@
         echo json_encode($DB->get_records_sql($sql));
     }
 
+    /*
+    gets readwrite data
+    */
     function getReadWriteData() {
         global $DB;
         $statsData = array();

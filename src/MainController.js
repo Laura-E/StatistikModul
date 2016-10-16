@@ -16,8 +16,21 @@ StatisticsModule.MainController = (function() {
 		$(mainModel).on('changeCountValues', onChangeCountValues); 
 		$(mainModel).on('showInactiveCoursesAndUsers', onShowInactiveCoursesAndUsers); 
 		$(mainModel).on('showInactiveCourses', onShowInactiveCourses);
+		$(mainModel).on('showCategoriesForParent', onShowCategoriesForParent); 
 		$(statisticsView).on('timeperiodValuesChanged', onTimeperiodValuesChanged); 
 		$(categoryStatisticsView).on('getInactiveCoursesAndUsers', onGetInactiveCoursesAndUsers); 
+		$(categoryStatisticsView).on('getCategoriesForParent', onGetCategoriesForParent); 
+	}, 
+
+	onShowCategoriesForParent = function(event, top, children, level) {
+		if(top.length != 0 && children.length != 0) {
+			categoryStatisticsView.addCategorySelectItem(top, children, level); 
+		}
+	}, 
+
+	onGetCategoriesForParent = function(event, value, level) {
+		console.log(value, level);
+		mainModel.getCategoriesForParent(value, level); 
 	}, 
 
 	onGetInactiveCoursesAndUsers = function(event, kind, count, dateType) {

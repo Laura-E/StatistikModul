@@ -18,6 +18,7 @@ StatisticsModule.MainModel = (function() {
 		getReadWriteData();  
 		getCourseData(); 
 		getCategoryData();
+
 		return that; 
 	}, 
 
@@ -107,6 +108,20 @@ StatisticsModule.MainModel = (function() {
 		}); 
 	}, 
 
+	getCategoriesForParent = function(topcategory, level) {
+		startSpinner(); 
+		$.ajax({url: "src/php/functions.php?command=getCategoriesForParent", data: {topcategory: topcategory}}).done(
+			function(data) {
+				var json = data; 
+				var object = jQuery.parseJSON(json);
+				console.log(object); 
+				var top = object["top"];
+				var children = object["children"];
+				$(that).trigger('showCategoriesForParent', [top, children, level]);
+				stopSpinner(); 
+		});
+	}	
+
 	/*
  	gets all inactive courses or users
  	*/
@@ -183,5 +198,6 @@ StatisticsModule.MainModel = (function() {
 	that.init = init; 
 	that.getCounts = getCounts; 
 	that.getInactiveCoursesAndUsers = getInactiveCoursesAndUsers; 
+	that.getCategoriesForParent = getCategoriesForParent; 
 	return that; 
 })(); 

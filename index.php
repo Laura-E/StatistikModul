@@ -160,7 +160,6 @@
         $PAGE->set_context($context);
         $PAGE->set_title("Statistikmodul");
         $PAGE->set_url('/StatisticsModule/index.php'); 
-        //$PAGE->set_pagelayout('frontpage');
         $PAGE->set_context(context_system::instance());
 
         //Ausgabe der Seite
@@ -197,7 +196,6 @@
                         </div>
                     </div>
                     <br />
-                    <!--<div id="categoriesChart"></div>-->
                     <div class="row" id="numbers">
                         <div class="col-md-4">
                             <div class="title box"><div>Zugriffe</div><br /><div class="number" id="readWriteCount"></div></div>
@@ -211,15 +209,15 @@
                     </div>
                     <br />
                         <div class="box">
-                            <div class="title">Zugriffs-Statistik<span id="readWriteChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="accessStatisticsMoreButton">mehr</div></div>
+                            <div class="title"><span class="enlargementModalTitle">Zugriffs-Statistik</span><span id="readWriteChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="accessStatisticsMoreButton">mehr</div></div>
                             <div class="innerBox"><div id="accessStatisticsChart"></div></div>
                         </div>
                         <div class="box">
-                            <div class="title">Login-Statistik<span id="loginChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="loginStatisticsMoreButton">mehr</div></div>
+                            <div class="title"><span class="enlargementModalTitle">Login-Statistik</span><span id="loginChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="loginStatisticsMoreButton">mehr</div></div>
                             <div class="innerBox"><div id="loginStatisticsChart"></div></div>
                         </div>
                         <div class="box">
-                            <div class="title">Kurs-Statistik<span id="courseChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
+                            <div class="title"><span class="enlargementModalTitle">Kurs-Statistik</span><span id="courseChartEnlargementButton" class="zmdi zmdi-zoom-in zmdi-hc-2x chartEnlargementButton"></span><div class="more" id="courseStatisticsMoreButton">mehr</div></div>
                             <div class="innerBox"><div id="courseStatisticsChart"></div></div>
                         </div>
                 </div>

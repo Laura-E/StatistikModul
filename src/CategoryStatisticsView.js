@@ -3,13 +3,10 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	categoryStatisticsTableItemCount = 0, 
 	categoryStatisticsCompareTableItemCount = 0, 
 	categoryStatisticsSelectItemCount = 0, 
-	categoryData = {}, 
 
 	init = function() {
-		addCategoryStatisticsSelectItem(); 
-		//$("#categoryStatisticsOptionsAddButton").on('click', onCategoryStatisticsOptionsAddButtonClick); 
+		addCategoryStatisticsSelectItem();  
 		$("#searchInactiveUsersButton").on('click', onSearchInactiveUsersButtonClick); 
-
 
 		return that; 
 	}, 
@@ -76,28 +73,26 @@ StatisticsModule.CategoryStatisticsView = (function() {
  	is given a json object
  	*/
 	addTagCloud = function(object) {
-		categoryData = object;
+		//categoryData = object;
 		var words = [];
 		for (var key in object) {
-			if(key != "all" && key != "parents" && key != "courses") {
-				var faculty = object[key];
-				var text = faculty["name"];
-				var weight = faculty["courses"];
-				var color = faculty["color"];
-				var materials = faculty["materials"];
-				var subscriber = faculty["subscriber"];
-				var trainer = faculty["trainer"];
-				var id = faculty["id"];
-				var word = {};
-				word['text'] = text;
-				word['weight'] = weight;
-				word['color'] = color;
-				word['materials'] = materials;
-				word['subscriber'] = subscriber;
-				word['trainer'] = trainer;
-				word['id'] = id;
-				words.push(word); 
-			}
+			var faculty = object[key];
+			var text = faculty["name"];
+			var weight = faculty["courses"];
+			var color = faculty["color"];
+			var materials = faculty["materials"];
+			var subscriber = faculty["subscriber"];
+			var trainer = faculty["trainer"];
+			var id = faculty["id"];
+			var word = {};
+			word['text'] = text;
+			word['weight'] = weight;
+			word['color'] = color;
+			word['materials'] = materials;
+			word['subscriber'] = subscriber;
+			word['trainer'] = trainer;
+			word['id'] = id;
+			words.push(word); 
 		}
 		$("#instituteSelect").hide();
 		$("#courseOfStudiesSelect").hide();
@@ -115,6 +110,10 @@ StatisticsModule.CategoryStatisticsView = (function() {
  	initializes the tag cloud 
  	*/
 	initCloud = function(words) {
+		var level = 1;
+		var value = 0;
+		$(that).trigger("getCategoriesForParent", [value, level]);
+
 		$("#tagcloud").jQCloud(words, {
 	      	autoResize: true, 
 	      	removeOverflowing: false, 
@@ -123,11 +122,8 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		    	to: 0.02
 		  	}
 	    });
-
 		setTimeout(function () {
 		    var obj = $("#tagcloud").data("jqcloud");
-		    var level = 1;
-		    addCategorySelectItem(level); 
 		}, 100);
 		$("#categoryStatisticsModal").on('shown.bs.modal', {'words': words}, onCategoryStatisticsModalShow); 
 	},  
@@ -229,7 +225,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	        seriesDefaults: {
 	            renderer: jQuery.jqplot.PieRenderer, 
 	            rendererOptions: {
-	                //dataLabels: chart_labels, 
 	                showDataLabels: true
 	            }
 	        }, 
@@ -416,59 +411,34 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	}, 
 
 	/*
- 	gets the under-categories of the selected category in the drop down menu
- 	*/
-	getData = function() {
-		var data = categoryData["all"]; 
-		var allSelects = $("#categoryStatisticsSelectItem0 select"); 
-		var length = allSelects.length; 
-		allSelects.each(function(index) {
-		  	var selected = $(this).find("option:selected").val();
-
-		   	if(index == length-1) {
-		   		
-		   		var subscriber = ('subscriber' in data[selected]) ? data[selected]["subscriber"] : ""; 
-		   		$("#categorySubscriberCount").html(subscriber);  
-			  	var trainer = ('trainer' in data[selected]) ? data[selected]["trainer"] : ""; 
-			  	$("#categoryTrainerCount").html(trainer); 
-			  	var materials = ('materials' in data[selected]) ? data[selected]["materials"] : ""; 
-			  	$("#categoryMaterialsCount").html(materials); 
-		   	}
-
-		  	if('subcategory' in data[selected]) {
-		  		data = data[selected]["subcategory"];
-		  	} else {
-		  		data = false; 
-		  	}
-		});
-		return data; 
-	}, 
-
-	/*
  	clears the existing charts when a new category, or a under-category is selected and adds new charts
  	*/
-	addCategorySelectItem = function(level) {
-		var data = getData(); 
+	addCategorySelectItem = function(top, children, level) {
+		$("#categorySubscriberCount").html(top["subscriber"]);  
+		$("#categoryTrainerCount").html(top["trainer"]); 
+		$("#categoryMaterialsCount").html(top["materials"]); 
+
+
 		$("#categoryStatisticsCompareTable").show(); 
-		if(data != false) {
+		if(children != false) {
 			if ($("#categoryStatisticsSelectItem0 select").length < level) {
-				$("#categoryStatisticsSelectItem0").append("<select></select>");
+				$("#categoryStatisticsSelectItem0").append('<select></select>');
 			}
 			$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").empty();
-			$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").append("<option>-</option>");
+			$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").append('<option value="-1">-</option>');
+			$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ") option[value='-1']").prop("selected", true);
 			$("#categoryStatisticsCompareTableItemContainer").empty(); 
 			var materialsChartData = []; 
 			var trainerChartData = []; 
 			var subscriberChartData = []; 
-			for (var i in data) {
-			    var name = data[i]["name"];
-			    //var color = data[i]["color"];
-			    var id = data[i]["id"];
+			for (var i in children) {
+			    var name = children[i]["name"];
+			    var id = children[i]["id"];
 
-			    if('materials' in data[i]) {
-			    	var subscriber = parseInt(data[i]["subscriber"]);
-			    	var trainer = parseInt(data[i]["trainer"]);
-			    	var materials = parseInt(data[i]["materials"]);
+			    if('materials' in children[i]) {
+			    	var subscriber = parseInt(children[i]["subscriber"]);
+			    	var trainer = parseInt(children[i]["trainer"]);
+			    	var materials = parseInt(children[i]["materials"]);
 
 			    	addCategoryStatisticsCompareTableItem(name, trainer, subscriber, materials);
 
@@ -507,21 +477,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 			});
 			initCategoryPlot('categoriesMaterialsChart', materialsChartData, "Materialien"); 
 		}
-		/*if(subscriberChartData.length != 0) initCategoryPlot('categoriesSubscriberChart', subscriberChartData, "Teilnehmer"); 
-		if(trainerChartData.length != 0) initCategoryPlot('categoriesTrainerChart', trainerChartData, "Dozenten"); 
-		if(materialsChartData.length != 0) initCategoryPlot('categoriesMaterialsChart', materialsChartData, "Materialien"); */
-
-		/*$("#categoryStatisticsSelectItem0 select:nth-child(" + level + ")").on('change', function(){
-			console.log($("#categoryStatisticsSelectItem0 select:nth-child(n+" + level + ")"));
-			$("#categoryStatisticsSelectItem0 select:nth-child(n+" + (level+1) + ")").remove(); 
-			var selected = $(this).find("option:selected").val();
-		   	console.log("selected", selected, 'subcategory' in data[selected]); 
-		   	if('subcategory' in data[selected]) {
-		   		data = data[selected]["subcategory"];
-		   		++level; 
-				addCategorySelectItem(data, level);
-		   	}
-		});*/
 	},
 
 	/*
@@ -536,21 +491,6 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		}
 		return chartData; 
 	},
-	
-	/*
- 	Unused
- 	*/
-	/*dynamicSort = function(property) {
-	    var sortOrder = 1;
-	    if(property[0] === "-") {
-	        sortOrder = -1;
-	        property = property.substr(1);
-	    }
-	    return function (a,b) {
-	        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-	        return result * sortOrder;
-	    }
-	}, */
 
 	/*
  	adds a new dropdown menu, when the category selection has changed or the parent category was selected new.
@@ -561,11 +501,11 @@ StatisticsModule.CategoryStatisticsView = (function() {
 		});
 
 		$("#categoryStatisticsSelectItem" + categoryStatisticsSelectItemCount).on('change', "select", function(){
-			console.log($(this), $(this).index());
-			level = $(this).index()+1;
+			var level = $(this).index()+1;
+			var value = parseInt($(this)[0].value); 
 			$("#categoryStatisticsSelectItem0 select:nth-child(n+" + (level+1 ) + ")").remove(); 
 		   	++level;
-		   	addCategorySelectItem(level);
+		   	$(that).trigger("getCategoriesForParent", [value, level]);
 		});
 
 		categoryStatisticsSelectItemCount++;
@@ -574,6 +514,7 @@ StatisticsModule.CategoryStatisticsView = (function() {
 	that.addTagCloud = addTagCloud; 
 	that.showInactiveCoursesAndUsers = showInactiveCoursesAndUsers;
 	that.showInactiveCourses = showInactiveCourses; 
+	that.addCategorySelectItem = addCategorySelectItem; 
 	that.init = init; 
 	return that; 
 })();
